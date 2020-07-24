@@ -1,13 +1,28 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
-    <router-view/>
+     <ion-app>
+          <ion-vue-router />
+     </ion-app>
+    <!-- <router-view/> -->
   </div>
 </template>
 
 <script>
 export default {
-  name: 'App'
+  name: 'App',
+  data(){
+    return{
+
+    }
+  },
+  mounted() {
+      window.addEventListener('unload',this.saveState)
+  },
+  methods: {
+    saveState(){
+      localStorage.setItem("state",JSON.stringify(this.$store.state))
+    }
+  }
 }
 </script>
 
