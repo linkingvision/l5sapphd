@@ -19,7 +19,7 @@ export default new IonicVueRouter({
     },
     {
       path: '/Onetoonevideo',
-      name: 'Onetoonevideo ',
+      name: 'Onetoonevideo',
       component: Onetoonevideo 
     },
   ]

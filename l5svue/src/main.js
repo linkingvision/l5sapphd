@@ -10,8 +10,10 @@ import Ionic from '@ionic/vue';
 import '@ionic/core/css/ionic.bundle.css';
 import 'lib-flexible/flexible'
 import 'jquery'
+import eventLists from '@/components/commonde/index'
 Vue.use(Ionic);
 Vue.use(ElementUI);
+Vue.use(eventLists);
 Vue.config.productionTip = false
 Vue.prototype.$http = axios
 const bus = new Vue()

@@ -30,6 +30,11 @@ export default new Vuex.Store({
           localStorage.h5appport= data
           state.callport=data
         },
+        [types.LOGIN]:(state, data) => {
+          console.log(data)
+          localStorage.h5stoken = data
+          state.token = data
+        },
     
         [types.USEPORTIP]: (state, data) => {
           //console.log("+++++++++++++",data);
