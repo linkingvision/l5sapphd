@@ -107,7 +107,7 @@ export default {
                 this.meettoken=msgevent.sendConference.token;
                 console.log("****",msgevent)
                 this.presentAlertConfirm()
-             }else if(msgevent.type=="H5S_EVENT_START_SHARE_DESKTOP"){
+      }else if(msgevent.type=="H5S_EVENT_START_SHARE_DESKTOP"){
 				        // this.sharedstart=msgevent.shareDesktop.token;
 				        // console.log("****",msgevent)
 			}else if(msgevent.type=="H5S_EVENT_STOP_SHARE_DESKTOP"){
@@ -121,12 +121,20 @@ export default {
 
 <style scoped>
 .alert-wrapper {
-  background: #e5e5e5;
+  background: #191919;
 }
 .my-custom-class .alert-wrapper {
-  background: #e5e5e5;
+  background: #191919;
 }
 .my-custom-class {
-  --background: #e5e5e5;
+  --background: #191919;
+} 
+</style>
+<style>
+.alert-wrapper {
+  background: #191919;
+}
+.my-custom-class .alert-wrapper {
+  background: #191919;
 } 
 </style>

@@ -6,7 +6,7 @@
                  <img src="../assets/imgs/l5slogo.png" alt="">
                  <ion-label style="--color:#FFFFFF">视频对讲</ion-label>
             
-                 <ion-button slot="end" class="onlineuser" expand="block" id="ion-button"> 
+                 <ion-button slot="end" class="onlineuser" expand="block" id="ion-button" @click="getuserlist()"> 
                       <img src="../assets/imgs/yonghu-10@2x.png" alt="">
                       <!-- <ion-label>在线联系人</ion-label> -->
                       <el-dropdown trigger="click"  @command="handleCommand">
@@ -39,11 +39,6 @@
                                <img src="../assets/imgs/onetoone.png" alt="">
                             </ion-button> 
                         </ion-item>
-                        <!-- <ion-item lines='none' class="item-left">
-                            <ion-button class="leftbtn">
-                               <img src="../assets/imgs/control.png" alt="">
-                            </ion-button>
-                        </ion-item> -->
                         <ion-item lines='none' class="item-left">
                             <ion-button class="leftbtn">
                                <img src="../assets/imgs/seting.png" alt="">
@@ -57,14 +52,28 @@
                    </ion-list>
                </ion-col>
                <ion-col size='15' class="leftmenu">
-                   <div class="conference">
+                     <!-- left top -->
+                    <ion-fab vertical="top" horizontal="start" class="videodesc">
+                          <ion-label class="videolabel">
+                               <h3>视频对讲研讨会</h3>
+                               <p><span>会议号：{{this.$store.state.usertoken}}</span><span>参会人:王经理</span></p>
+                          </ion-label>
+                    </ion-fab>
+                     <!-- left top -->
+                    <ion-fab vertical="top" horizontal="end" class="videoleave">
+                          <ion-button class="videobutton" shape="round" @click="stop()">
+                              <ion-label>离开</ion-label>
+                          </ion-button>
+                    </ion-fab>
+                    
+                    <div class="conference">
                        <div class="conferencebgc"></div>
                        <ion-label>暂无联系人</ion-label>
                    </div>
                    <div class="flatvideo">
                        <video id="h5sVideoRemote" src="" class="intercomvideoplay" autoplay webkit-playsinline playsinline style= "object-fit: fill;" poster="../assets/imgs/blank.png"></video>
                        <video id="h5sVideoLocal" muted src="" autoplay class="h5sLocal" webkit-playsinline playsinline></video>
-                   </div>
+                   </div>   
                    <ion-fab class="footerbtn" vertical="bottom" horizontal="center" >
                         <ion-button class="fabbutton" @click="handercall()">
                             <img src="../assets/imgs/audio.png" alt="">
@@ -75,6 +84,17 @@
                         <ion-button class="fabbutton">
                             <img src="../assets/imgs/gongxiamg.png" alt="">
                         </ion-button>
+                   </ion-fab>
+                   <ion-fab vertical="bottom" horizontal="end" class="sendnativ">
+                       <ion-item class="nativsend" lines='none'>
+                           <ion-input class="sendinput" enterkeyhint='send' :value='chattext'  @ionChange="chattext=$event.target.value"></ion-input>
+                           <ion-button class="sendbutton" @click="sendmessage()">
+                               <ion-labe>
+                                   <p>发</p>
+                                   <p>送</p>
+                               </ion-labe>
+                           </ion-button>
+                       </ion-item>
                    </ion-fab>
                 </ion-col>
              </ion-row>
@@ -106,7 +126,8 @@ export default {
             VideoIn:'',
             Bitratess:'',
             Resolution:'',
-            AudioIn:''
+            AudioIn:'',
+            chattext:'',
         }
     },  
  beforeDestroy() {
@@ -152,15 +173,34 @@ export default {
             console.log(res)
             let useritem=res.data.userList
             if(res.status==200){
+                let obj={};
                 for(let i=0;i<useritem.length;i++){
-                if(this.$store.state.Useport.user==useritem[i].strName){
-                    continue
-                }
-                this.userdata.push(useritem[i])
+                   if(this.$store.state.Useport.user==useritem[i].strName){
+                      continue
+                   }
+                  this.userdata.push(useritem[i])
                 } 
             }
             }).catch(()=>console.log('promise catch err'))
       },
+     //重新获取在线联系人   
+    getuserlist(){
+        //  this.getuser()
+    },
+    // 发送消息
+    sendmessage(){
+            console.log("消息内容",this.chattext);
+            if (this.v1 != undefined)
+            {
+                if(this.chattext){
+                    console.log('我有字了')
+                    this.v1.send(this.usertoken,this.chattext)
+                    this.chattext=""
+                }else{
+                    this.$message('消息不能为空');
+                }
+            }
+        },
     //  拨打视频
     handleCommand(command){
          console.log(command)
@@ -222,6 +262,8 @@ export default {
                     this.v1.disconnect();
                     delete this.v1;
                     this.v1 = undefined;
+                    $("#h5sVideoLocal").get(0).load();
+                    $("#h5sVideoLocal").get(0).poster = '';
                 }
                 var audioout=this.audioout
                 var conf1 = {
@@ -239,6 +281,7 @@ export default {
                     consolelog: 'true' // 'true' or 'false' enable/disable console.log
                 };
                 // return false
+                console.log('******'+conf1)
                 this.v1 = new H5sRTCPush(conf1);
                 console.log(conf1)
                 console.log("*******",this.VideoCodec,"1*",
@@ -261,9 +304,10 @@ export default {
          },
         // 消息
         PlaybackCB(event, userdata){
-            
+            console.log(1)
             var msgevent = JSON.parse(event);
-            // var chatrecorddata={
+            console.log('发来的消息',msgevent)
+            // var chatrecorddata={ 
             //     user:msgevent.user,
             //     msg:msgevent.msg
             // }
@@ -272,7 +316,7 @@ export default {
             //     let ele = document.getElementById('chatrecord');
             //     ele.scrollTop = ele.scrollHeight;
             // })
-            console.log("Playback callback ", event,msgevent,this.chatrecord,chatrecorddata);
+            console.log("Playback callback ", event,msgevent);
         },
         //参数
        UpdateCapability(capability){
@@ -330,19 +374,21 @@ export default {
         }, 
          // 停止 
        stop(){
-            if (this.h5handler != undefined)
+            if (this.h5handler!= undefined)
             {
                 this.h5handler.disconnect();
                 delete this.h5handler;
                 this.h5handler = undefined;
+                console.log('h5handler')
             }
-            if (this.v1 != undefined)
+            if (this.v1!= undefined)
             {
                 this.v1.disconnect();
                 delete this.v1;
                 this.v1 = undefined;
-            }
-        
+                console.log('')
+             }
+             console.log('停止')
         }, 
     }
 }
@@ -359,8 +405,39 @@ ul li{
 .flatheader{
     --background:#282828;
     font-size: 18px;
-    font-weight: 500;
+    font-weight: 700;
 }
+/* 头部 */
+.videodesc{
+    left:20px;
+}
+.videoleave{
+    right: 20px;
+}
+.videobutton{
+    margin-top: 20px;
+    height: 35px;
+    font-size: 10px;
+}
+.videolabel{
+    text-align: left;
+    margin-left: 20px;
+}
+.videolabel h3{
+    color: #FCF9FC;
+    font-weight: 700;
+    line-height: 25px;
+    font-size: 13px;
+}
+.videolabel p{
+    color:#C9C6C9;
+    font-weight: 500;
+    font-size: 8px;
+}
+.videolabel p span:nth-child(1){
+    margin-right:10px;
+}
+/* 获取在线客户 */
 .onlineuser{
     font-size: 18px;
     height: 100%;
@@ -525,4 +602,33 @@ ul li{
      width:20px;
      height: 22px;
   }
+  /* 消息发送 */
+  .sendnativ{
+     bottom: 50px;
+  }
+ .nativsend{
+    --background: transparent;
+    width:300px;
+    --min-height:40px;
+    --padding-bottom:0;
+    --padding-top:0;
+    --inner-padding-end:0;
+    }
+  .sendinput{
+    --background:#1B181C;
+    /* --padding-top:3px;
+    --padding-bottom:3px; */    
+    --padding-start:8px !important;
+    border-radius:10px 0 0 10px;
+     --color:#FFFFFF;
+    }
+  .sendbutton{
+      margin: 0;
+      height: 100%;
+      --border-radius:0 10px 10px 0;
+    }
+   .sendbutton p{
+      line-height: 0;
+      
+   }
 </style>
