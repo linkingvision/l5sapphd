@@ -96,7 +96,7 @@ export default {
             var data = res.data;
             if (data.bStatus == true){
             this.$store.commit(types.LOGIN, data["strSession"]);
-            _this.$router.push('/Onetoonevideo');
+            _this.$router.push('/Conferencelayout');
           }
       }).catch((err)=>{console.log(err)})
     },

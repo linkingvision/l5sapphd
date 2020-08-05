@@ -3,6 +3,8 @@ import Vue from 'vue'
 import Flatlogin from '@/components/flatlogin'
 import Onetoonevideo from '@/components/Onetoonevideo'
 import Conference from '@/components/conference'
+import Conferencelayout from '@/components/conferencelayout'
+
 import { IonicVueRouter } from '@ionic/vue'
 Vue.use(IonicVueRouter)
 
@@ -27,6 +29,11 @@ export default new IonicVueRouter({
       path: '/Conference',
       name: 'Conference',
       component: Conference 
+    },
+    {
+      path: '/Conferencelayout',
+      name: 'Conferencelayout',
+      component: Conferencelayout 
     },
   ]
 })
