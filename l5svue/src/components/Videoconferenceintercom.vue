@@ -1,9 +1,9 @@
 <template>
    <div class="Onetoonevideo">
-       <ion-content class="flatcontent">
+      <ion-content class="flatcontent">
           <ion-grid class="leftrow">
              <ion-row class="leftrow">
-                <ion-col size='16' class="leftmenu">
+               <ion-col size='16' class="leftmenu">
                      <!-- left top -->
                     <ion-fab vertical="top" horizontal="start" class="videodesc">
                           <ion-label class="videolabel">
@@ -67,7 +67,7 @@ import {H5siOS,H5sPlayerCreate} from '../assets/js/h5splayerhelper.js'
 import {H5sPlayerWS,H5sPlayerHls,H5sPlayerRTC,H5sRTCGetCapability,H5sPlayerAudBack,H5sConference,H5sRTCPush} from '../assets/js/h5splayer.js'
 import * as types from '@/vuex/types'
 export default {
-    name: 'Onetoonevideo',
+    name: 'Videoconferenceintercom',
     data(){
         return{
             v1:undefined,

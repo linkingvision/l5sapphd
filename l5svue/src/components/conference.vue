@@ -1,6 +1,6 @@
 <template>
    <div class="conference">
-      <ion-grid>
+     <ion-grid>
          <ion-row>
               <ion-col class="conference-title">
                   <ion-label>紧急会议</ion-label>
@@ -12,7 +12,7 @@
                     <div class="urgencybgc">
                         <ion-label class="conference-itemlabel">
                             <h3>技术交流视频会议</h3>
-                            <p class="conferencenum"><span>2020.09.27 8:00</span> <span>会议号:8585</span></p>
+                            <p class="conferencenum"><span>{{daterecent.beginTime}}</span> <span>会议号:{{daterecent.strToken}}</span></p>
                             <p class="conferencestart">距离开始 <strong>00:45:30</strong> 现可以一键加入会议</p>
                         </ion-label> 
                         <ion-thumbnail slot="end" class="thumbnail">
@@ -26,7 +26,7 @@
                      <ion-button class="jioinbutton">加入会议</ion-button>
                  </ion-item>
                  <ion-item lines="none" class="rightjioin">
-                     <ion-button color='success' class="jioinbutton">创建会议</ion-button>
+                     <ion-button color='success' class="jioinbutton" @click="createdconfer()" expand="block">创建会议</ion-button>
                  </ion-item>
               </ion-col>
           </ion-row>
@@ -36,43 +36,177 @@
               </ion-col>
           </ion-row>
           <ion-row>
-              <ion-col size='4' class="colbacklog">
-                   <ion-item class="conference-action-item" button lines="none" detail='false'>
+              <ion-col size='4' class="colbacklog" v-for="(item,index) in meetdata" :key="index">
+                   <ion-item class="conference-action-item" button lines="none" detail='false'  @click="mettevent(item.strToken)">
                           <ion-label class="action-label">
-                                <h3 >L5S会议平台 <span>..进行中</span> </h3>
-                                <p>视频技术交流会议</p>
-                                <h4>日期：2020.0604.08.07 <span>会议号：5858</span></h4>
+                                <h3 >L5S会议平台</h3>
+                                <p>技术交流视频会议</p>
+                                <h4>日期:{{item.beginTime}}<span>会议号：{{item.strToken}}</span></h4>
                                 <h4 class="jioninbuttons">
-                                    <span>.</span><span>定期会议</span> 
+                                    <span class="inlineblock"></span><span>定期会议</span> 
                                 </h4>
-                         </ion-label>
-                        <ion-note slot="end" class="boting" color='primary'>..进行中</ion-note>
+                           </ion-label>
+                        <ion-note slot="end" class="boting" color='success' v-if="item.bStartStatus">..进行中</ion-note>
+                        <ion-note slot="end" class="boting" color='primary' v-if="!item.bStartStatus">筹备中</ion-note>
                         <ion-fab vertical="bottom" horizontal="end" class="actrion-button">
-                            <ion-button fill="outline" class="joinconference" >进入会议</ion-button>
+                            <ion-button fill="outline" class="joinconference" v-if="!item.bStartStatus">等待会议</ion-button>
+                            <ion-button  class="joinconference" v-if="item.bStartStatus">加入会议</ion-button>
                         </ion-fab>
                   </ion-item>
               </ion-col>
           </ion-row>
       </ion-grid>
-   </div>
+    </div>
 </template>
-
 <script>
+import Modal from './commonde/modal.vue'
+import { modalController } from '@ionic/core';
+window.modalController = modalController;
 export default {
+name:'Conference',
+props: { timeout: { type: Number, default: 2000 },},
 data(){
     return{
-
+       meetdata:[],
+       daterecent:[],
+       conference:'',
+       joinusertoken:''
     } 
 },
+mounted(){
+    this.meetingdata() 
+},
  methods: {
-    // 最近会议
-    urgency(){
+   // 创建会议模态框 
+   createdconfer(){
+        this.$parent.createdModal();
+     },
+   
+   //会议开始播放
+   mettevent(jointoken){
+       var url = this.$store.state.callport + "/api/v1/GetConference?session="+ this.$store.state.token;
+            this.$http.get(url).then(result=>{
+                if(result.status==200){
+                    console.log(result)
+                    var data=result.data.conference
+                    for(var i=0;i<data.length;i++){
+                        if(jointoken==data[i].strToken){
+                            if(data[i].bStartStatus){
+                                console.log(data[i].bStartStatus)
+                                $('.joinconference').hide()
+                                this.presentLoading(jointoken)
+                                this.$nextTick(() => {
+                                    this.$router.push({
+                                        name: `Playconferce`,
+                                        path: 'Playconferce',
+                                        params: {
+                                            token:jointoken
+                                        }
+                                    })
+                                })
+                               
+                            }else{
+                                console.log(888)
+                                const toast = document.createElement('ion-toast');
+                                toast.color ='danger'
+                                toast.message = '会议还未开始';
+                                toast.position = 'top';
+                                toast.duration = 2000;
+                                document.body.appendChild(toast);
+                                return toast.present();
+                                console.log(888)
+                            }
+                        }
+                    }
+                } 
+         })
+      },
+   // 懒加载
+   presentLoading(jointoken) {
+        return this.$ionic.loadingController
+        .create({
+          cssClass: 'my-custom-class',
+          message: '进入会议号为：'+jointoken+'的房间',
+          duration: this.timeout,
+        })
+        .then(loading => {
+          setTimeout(function() {
+            loading.dismiss()
+          }, this.timeout)
+          return loading.present()
+        })
+    },
+    // 获取会议列表
+    meetingdata(){
+         var url = this.$store.state.callport + "/api/v1/GetConference?session="+ this.$store.state.token;
+        this.$http.get(url).then(result=>{
+            if(result.status==200){
+                // this.meetdata=result.data.conference
+                console.log(result)
+                var data=result.data.conference
+                if(data.length==0){
+                    return false
+                }
+                for(var i=0;i<data.length;i++){
+                    // console.log("1*",data[i].strType)
+                    if(data[i].strType=="temporary"){
+                        continue 
+                    }
+                    var beginTime=new Date(data[i].beginTime).getTime();
+                    var begin=new Date(data[i].beginTime);  
+                    var eng=new Date(data[i].endTime)
+                    console.log(eng)
 
-    }
- }
+                    //年月日
+                    var y = begin.getFullYear();
+                    var m = this.addZero(begin.getMonth()+1);
+                    var d = this.addZero(begin.getDate());
+                    //时分秒
+                    var h = this.addZero(begin.getHours());
+                    var mm = this.addZero(begin.getMinutes());
+                    var rq=y+'.'+m+'.'+d+" "+h+':'+mm;
+                    var listdata={
+                        bStartStatus: data[i].bStartStatus,
+                        beginTime: rq,
+                        beginTime1: beginTime,
+                        endTime: data[i].endTime,
+                        mosaicSize: data[i].mosaicSize,
+                        mosaicType: data[i].mosaicType,
+                        nId: data[i].nId,
+                        strName: data[i].strName,
+                        strToken: data[i].strToken,
+                        strType: data[i].strType,
+                    }
+                    this.meetdata.push(listdata)
+                    console.log("1*",this.meetdata)
+                }
+                if(this.meetdata.length!=0){
+                    this.meetdata.sort(function(a,b){
+                        return  b.beginTime1-a.beginTime1
+                    })
+                    var daterecent=Math.round(new Date().getTime())
+                    var newArr = [];
+                    this.meetdata.map(function(x){
+                        // 对数组各个数值求差值
+                        newArr.push(Math.abs(x.beginTime1 - daterecent));
+                        // console.log(newArr,x.beginTime1 - daterecent,x.beginTime1,daterecent)
+                    });
+                    // 求最小值的索引
+                    var index = newArr.indexOf(Math.min.apply(null, newArr))
+                    this.daterecent=this.meetdata[index]
+                    console.log(this.meetdata[index])
+                    console.log(this.daterecent,"1")
+                }
+            }
+        })
+       },
+    addZero(n){
+            return n<10?"0"+n:n;
+      }, 
+  }
 }
 </script>
-
+ 
 <style scoped>
 .conference{
     width:100%;
@@ -91,10 +225,10 @@ data(){
      --color:#D3D3D3;
      --min-height:200px;
      --padding-start:0;
-      --border-radius:15px;
+      --border-radius:20px;
      --inner-padding-end:0;
      --color-activated:#1562FF !important;
-     --background-activated:#1562FF;
+     --background-activated:#020002;
     
 }
 .urgencybgc{
@@ -127,6 +261,8 @@ data(){
 .thumbnail{
     --size:130px;
     margin-left:25px;
+    position: absolute;
+    right:60px;
 }
 .rightjioin{
     --background:transparent;
@@ -143,19 +279,19 @@ data(){
     --ion-grid-columns:12;
 }
 .conference-action-item{
-     --background:#121212;
+     --background:#282828;
      --color:#D3D3D3;
      --color-activated:#1562FF !important;
      --background-activated:#1562FF;
 }
 .action-label h3{
     font-size: 18px;
-    color:#F8F8F8;
+    color:#C9C6C9;
     text-align: left;
     font-weight: 600;
 }
 .action-label p{
-    font-size: 5px !important;
+    font-size: 15px !important;
     color:#F8F8F8;
 }
 .action-label h4{
@@ -171,16 +307,29 @@ data(){
     z-index: 100;
 }
 .jioninbuttons{
-   line-height: 32px;
-   font-size: 10px !important;
-   --color:#F8F8F8;
+    line-height: 32px;
 }
-.actrion-button{
+.jioninbuttons .inlineblock{
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    border: 1px solid #1562FF;
+    background-color: #1562FF;
+    vertical-align: middle;
+    border-radius: 50%;
+    margin-right:12px;
+} 
+/* .actrion-button{
     
-}
+} */
 .joinconference{
     width: 100px;
     height:30px;
-    
 }
+.jioninbuttons span{
+    color:#F8F8F8;
+    font-size: 12px !important;
+    font-weight: 600;
+}
+
 </style>

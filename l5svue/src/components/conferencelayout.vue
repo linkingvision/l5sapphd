@@ -6,6 +6,7 @@
                  <img src="../assets/imgs/l5slogo.png" alt="">
                  <ion-label style="--color:#FFFFFF" v-if="conferencevalue=='1'" @click="getuserlist()" >视频会议</ion-label>
                  <ion-label style="--color:#FFFFFF" v-if="conferencevalue=='2'">视频对讲</ion-label>
+                 <ion-label style="--color:#FFFFFF" v-if="conferencevalue=='Videoconferenceintercom'">视频会议</ion-label>
                 <ion-button slot="end" class="onlineuser" expand="block" id="ion-button" v-if="conferencevalue=='2'"> 
                       <img src="../assets/imgs/yonghu-10@2x.png" alt="">
                       <!-- <ion-label>在线联系人</ion-label> -->
@@ -19,8 +20,22 @@
                                 </el-dropdown-item>
                             </el-dropdown-menu>
                       </el-dropdown>
-                 </ion-button>
-               
+                </ion-button>
+
+                <ion-button slot="end" class="onlineuser" expand="block" id="ion-button" v-if="conferencevalue=='Videoconferenceintercom'"> 
+                        <img src="../assets/imgs/yonghu-10@2x.png" alt="">
+                        <!-- <ion-label>在线联系人</ion-label> -->
+                        <el-dropdown trigger="click"  @command="handleCommand">
+                                <span class="el-dropdown-link">
+                                    参会成员
+                                </span>
+                                <el-dropdown-menu slot="dropdown">
+                                    <el-dropdown-item v-for="(item, index) in userdata" :key="index" :command='item'>
+                                        <img src="../assets/imgs/yonghu-10@2x.png" alt="">{{item.strName}}
+                                    </el-dropdown-item>
+                                </el-dropdown-menu>
+                        </el-dropdown>
+                </ion-button>
             </ion-item>
           </ion-toobar>
        </ion-header>
@@ -53,13 +68,21 @@
                </ion-col>
                <ion-col size='15' class="leftmenu">
                   <Conference v-if="conferencevalue=='1'"></Conference>
+                  <!-- <Videoconferenceintercom></Videoconferenceintercom> -->
+                  <Onetoone v-if="conferencevalue=='2'"></Onetoone>
                </ion-col>
              </ion-row>
           </ion-grid> 
        </ion-content>
        <ion-footer></ion-footer>
        <eventLists></eventLists>
-   </div>
+       <!--创建会议弹框 -->
+       <ion-backdrop stop-propagation="true" class="backdrop" ></ion-backdrop>
+       <ion-fab vertical="start" horizontal="start" slot="fixed" class="createdModal">
+                <Modal></Modal>
+       </ion-fab>
+       
+    </div>
 </template>
 
 <script>
@@ -72,10 +95,16 @@ import {H5siOS,H5sPlayerCreate} from '../assets/js/h5splayerhelper.js'
 import {H5sPlayerWS,H5sPlayerHls,H5sPlayerRTC,H5sRTCGetCapability,H5sPlayerAudBack,H5sConference,H5sRTCPush} from '../assets/js/h5splayer.js'
 import * as types from '@/vuex/types'
 import Conference from './conference'
+import Videoconferenceintercom from './Videoconferenceintercom'
+import Onetoone from './Onetoonevideo'
+import Modal from './commonde/modal.vue'
 export default {
     name: 'Onetoonevideo',
     components: {
         Conference,
+        Videoconferenceintercom,
+        Onetoone,
+        Modal,
     },
     data(){
         return{
@@ -104,7 +133,7 @@ export default {
       H5sRTCGetCapability(this.UpdateCapability)  
    },
   mounted(){
-      
+      this.getuser() 
   },
   methods:{
      //  点击打开会议页面
@@ -114,12 +143,26 @@ export default {
      //  点击打开一对一会议
     oneToonevue(){
         this.conferencevalue='2'
-        this.getuser() 
+        
     },
      //  点击打开进入设置页面
      sendbutton(){
         this.conferencevalue='3' 
-    }, 
+    },
+     // 创建元素的显示
+    Videoconferenceintercom(){
+        this.conferencevalue='Videoconferenceintercom' 
+    },
+    // 显示模态框
+    createdModal(){
+         $('.backdrop').css('display','block')
+         $('.createdModal').css('display','block')
+    },
+    //  隐藏模态框
+    hidden(){
+        $('.backdrop').css('display','none')
+         $('.createdModal').css('display','none')
+    },
      //  获取用户信息
     getuser(){
           let slideurl=this.$store.state.callport;
@@ -425,8 +468,23 @@ ul li{
       height: 100%;
       --border-radius:0 10px 10px 0;
     }
-   .sendbutton p{
+ .sendbutton p{
       line-height: 0;
-      
-   }
+}
+ ion-backdrop {
+      opacity: 0.6;
+}
+.backdrop{
+      display: none;
+}
+.createdModal{
+      width:40%;
+      height: 80%;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%,-50%);
+      z-index: 9999999999999999999999;
+      display: none;
+}
+
 </style>
