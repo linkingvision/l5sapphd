@@ -96,13 +96,8 @@ mounted(){
                                 $('.joinconference').hide()
                                 this.presentLoading(jointoken)
                                 this.$nextTick(() => {
-                                    this.$router.push({
-                                        name: `Playconferce`,
-                                        path: 'Playconferce',
-                                        params: {
-                                            token:jointoken
-                                        }
-                                    })
+                                    this.$emit('Videoconferenceintercom',jointoken)
+                                    this.$parent.Videoconferenceintercom()
                                 })
                                
                             }else{

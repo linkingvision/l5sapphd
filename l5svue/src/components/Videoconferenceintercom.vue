@@ -53,7 +53,7 @@
           </ion-grid> 
        </ion-content>
        <ion-footer></ion-footer>
-       <eventLists></eventLists>
+       <!-- <eventLists></eventLists> -->
    </div>
 </template>
 

@@ -53,7 +53,7 @@
           </ion-grid> 
        </ion-content>
        <ion-footer></ion-footer>
-       <eventLists></eventLists>
+       <!-- <eventLists></eventLists> -->
    </div>
 </template>
 
@@ -68,12 +68,13 @@ import {H5sPlayerWS,H5sPlayerHls,H5sPlayerRTC,H5sRTCGetCapability,H5sPlayerAudBa
 import * as types from '@/vuex/types'
 export default {
     name: 'Onetoonevideo',
+    props:["userdatatoken"],
     data(){
         return{
             v1:undefined,
             h5handler:undefined,
             userdata:[],
-            usertoken:this.$route.params.token,
+            usertoken:userdatatoken,
             audioout:'',
             VideoIn:'',
             Bitratess:'',
@@ -100,17 +101,18 @@ export default {
       H5sRTCGetCapability(this.UpdateCapability)  
    },
   mounted(){
+      console.log(this.userdatatoken)
       this.getuser()
       let _this=this
-      //  在其他的页面的值
+      //  在其他页面传过来拨打的值
       if(_this.usertoken!=undefined){
         console.log("播放",this.usertoken)
         _this.l5svideplay()
      }
-      //  在本页面传过来拨打的值
+      //  在本页面的拨打过来的值
      _this.$root.bus.$on('meettoken', function(token){
         console.log("播放",token)
-        _this.usertoken=token
+        _this.usertoken=token   
         _this.l5svideplay()
      });
            
@@ -132,13 +134,9 @@ export default {
                    }
                   this.userdata.push(useritem[i])
                 } 
-            }
+               }
             }).catch(()=>console.log('promise catch err'))
       },
-     //重新获取在线联系人   
-    getuserlist(){
-        //  this.getuser()
-    },
     // 发送消息
     sendmessage(){
             console.log("消息内容",this.chattext);
@@ -153,55 +151,30 @@ export default {
                 }
             }
         },
-    //  拨打视频
-    handleCommand(command){
-         console.log(command)
-         let playVlue=command.strName
-         this.videocall(playVlue)
-     },
-     //视频对讲
-    videocall(playVlue){
-          console.log(playVlue)
-          var token = uuid(4, 10);
-          this.usertoken=token
-          this.$store.commit(types.USERTOKEN, token)
-          var starfs=new Date().getTime();
-          var endds=new Date().getTime();
-          var ks=new Date(starfs).toISOString()+"08:00";
-          var jss=new Date(endds).toISOString()+"08:00";
-
-          var url = this.$store.state.callport + "/api/v1/OnetoOneConference?name="
-          +this.$store.state.Useport.user+"&token="
-          +token+"&begintime="
-          +ks+"&endtime="
-          +jss+"&user="
-          +playVlue+"&session="+ this.$store.state.token;
-          this.$http.get(url).then(res=>{
-               console.log(res)
-               this.l5svideplay();
-          })
-       } ,
+   
      //播放视频
     l5svideplay(){
-          if (this.h5handler != undefined)
+          console.log(this.userdatatoken)
+         if (this.h5handler != undefined)
           {    
                this.h5handler.disconnect();
                delete this.h5handler;
                this.h5handler = undefined;
           }
         //   console.log(playid,token,streamprofile)
+          let conftoken=this.usertoken
           let conf = {
                videoid:"h5sVideoRemote",
                protocol:this.$store.state.protocol, //http: or https:
                host: this.$store.state.Useport.ip+':'+this.$store.state.Useport.port, //localhost:8080
                streamprofile: "main", // {string} - stream profile, main/sub or other predefine transcoding profile
                rootpath: '/', // '/'
-               token: this.usertoken,
+               token:conftoken,
                hlsver: 'v1', //v1 is for ts, v2 is for fmp4
                session: this.$store.state.token //session got from login
           };
             console.log("播放",conf);
-            
+            console.log(conftoken)
             this.h5handler = new H5sPlayerWS(conf);
             this.h5handler.connect( );
             
@@ -214,8 +187,6 @@ export default {
                     this.v1.disconnect();
                     delete this.v1;
                     this.v1 = undefined;
-                    $("#h5sVideoLocal").get(0).load();
-                    $("#h5sVideoLocal").get(0).poster = '';
                 }
                 var audioout=this.audioout
                 var conf1 = {

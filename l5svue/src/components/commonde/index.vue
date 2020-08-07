@@ -12,8 +12,8 @@ export default {
    data(){
        return{
           meettoken:undefined,
-		  sharedstart:undefined,
-		  sharedstop:undefined, 
+		      sharedstart:undefined,
+		      sharedstop:undefined, 
           el:undefined,
        }
    },
@@ -35,20 +35,7 @@ export default {
      // 视频播放
      l5svideplay(){
         if(this.meettoken!=undefined){
-            console.log(this.$router.history.current.name)
-            if(this.$router.history.current.name!='Onetoonevideo'){
-                console.log(this.$router.history.current.name)
-                console.log("*****"+888888)
-                this.$router.push({
-                        name: `Onetoonevideo`,
-                        path: 'Onetoonevideo',
-                        params: {
-                            token:this.meettoken
-                        }
-			     })
-             }else{  
-                  this.$root.bus.$emit('meettoken', this.meettoken);
-            }
+           this.$root.bus.$emit('meettoken', this.meettoken);
         }
      },
        //会议通知弹窗    

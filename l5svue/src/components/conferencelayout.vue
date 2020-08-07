@@ -1,5 +1,6 @@
 <template>
    <div class="Onetoonevideo">
+        <eventLists></eventLists>
        <ion-header>
           <ion-toobar>
             <ion-item class="flatheader">
@@ -68,20 +69,18 @@
                </ion-col>
                <ion-col size='15' class="leftmenu">
                   <Conference v-if="conferencevalue=='1'"></Conference>
-                  <!-- <Videoconferenceintercom></Videoconferenceintercom> -->
-                  <Onetoone v-if="conferencevalue=='2'"></Onetoone>
+                  <Videoconferenceintercom v-if="conferencevalue=='Videoconferenceintercom'"></Videoconferenceintercom>
+                  <Onetoone v-if="conferencevalue=='2'" ref="linkonetoone" :userdatatoken="usertokens"></Onetoone>
                </ion-col>
              </ion-row>
           </ion-grid> 
        </ion-content>
        <ion-footer></ion-footer>
-       <eventLists></eventLists>
        <!--创建会议弹框 -->
        <ion-backdrop stop-propagation="true" class="backdrop" ></ion-backdrop>
        <ion-fab vertical="start" horizontal="start" slot="fixed" class="createdModal">
                 <Modal></Modal>
        </ion-fab>
-       
     </div>
 </template>
 
@@ -111,7 +110,7 @@ export default {
             v1:undefined,
             h5handler:undefined,
             userdata:[],
-            usertoken:this.$route.params.token,
+            usertokens:'',
             conferencevalue:'1'
         }
     },  
@@ -161,7 +160,7 @@ export default {
     //  隐藏模态框
     hidden(){
         $('.backdrop').css('display','none')
-         $('.createdModal').css('display','none')
+        $('.createdModal').css('display','none')
     },
      //  获取用户信息
     getuser(){
@@ -194,7 +193,7 @@ export default {
     videocall(playVlue){
           console.log(playVlue)
           var token = uuid(4, 10);
-          this.usertoken=token
+          this.usertokens=token
           this.$store.commit(types.USERTOKEN, token)
           var starfs=new Date().getTime();
           var endds=new Date().getTime();
@@ -209,8 +208,8 @@ export default {
           +playVlue+"&session="+ this.$store.state.token;
           this.$http.get(url).then(res=>{
                console.log(res)
-            //    this.l5svideplay();
-          })
+               this.$refs.linkonetoone.l5svideplay();
+            })
        } ,
      
      // 停止 

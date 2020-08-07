@@ -8,8 +8,12 @@
 </template>
 
 <script>
+
 export default {
   name: 'App',
+  // components: {
+  //    'tabbar':Tabbars,
+  // },
   data(){
     return{
 
