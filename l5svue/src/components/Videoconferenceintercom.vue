@@ -68,12 +68,13 @@ import {H5sPlayerWS,H5sPlayerHls,H5sPlayerRTC,H5sRTCGetCapability,H5sPlayerAudBa
 import * as types from '@/vuex/types'
 export default {
     name: 'Videoconferenceintercom',
+    props:["videotokeo"],
     data(){
         return{
             v1:undefined,
             h5handler:undefined,
             userdata:[],
-            usertoken:this.$route.params.token,
+            usertoken:this.videotokeo,
             audioout:'',
             VideoIn:'',
             Bitratess:'',
@@ -81,7 +82,15 @@ export default {
             AudioIn:'',
             chattext:'',
         }
-    },  
+    }, 
+watch:{
+    videotokeo:{
+        handler(val,oldval){
+           this.usertoken=val
+        },
+        deep:true
+    }
+ }, 
  beforeDestroy() {
         if (this.h5handler != undefined)
         {
@@ -100,45 +109,9 @@ export default {
       H5sRTCGetCapability(this.UpdateCapability)  
    },
   mounted(){
-      this.getuser()
-      let _this=this
-      //  在其他的页面的值
-      if(_this.usertoken!=undefined){
-        console.log("播放",this.usertoken)
-        _this.l5svideplay()
-     }
-      //  在本页面传过来拨打的值
-     _this.$root.bus.$on('meettoken', function(token){
-        console.log("播放",token)
-        _this.usertoken=token
-        _this.l5svideplay()
-     });
-           
+      this.l5svideplay()
   },
   methods:{
-     // 获取用户信息
-    getuser(){
-          let slideurl=this.$store.state.callport;
-          let rooturl=slideurl+"/api/v1/GetOnlineUserList?session=" +this.$store.state.token;
-          console.log(rooturl)
-          this.$http.get(rooturl).then(res=>{
-            console.log(res)
-            let useritem=res.data.userList
-            if(res.status==200){
-                let obj={};
-                for(let i=0;i<useritem.length;i++){
-                   if(this.$store.state.Useport.user==useritem[i].strName){
-                      continue
-                   }
-                  this.userdata.push(useritem[i])
-                } 
-            }
-            }).catch(()=>console.log('promise catch err'))
-      },
-     //重新获取在线联系人   
-    getuserlist(){
-        //  this.getuser()
-    },
     // 发送消息
     sendmessage(){
             console.log("消息内容",this.chattext);
@@ -153,36 +126,9 @@ export default {
                 }
             }
         },
-    //  拨打视频
-    handleCommand(command){
-         console.log(command)
-         let playVlue=command.strName
-         this.videocall(playVlue)
-     },
-     //视频对讲
-    videocall(playVlue){
-          console.log(playVlue)
-          var token = uuid(4, 10);
-          this.usertoken=token
-          this.$store.commit(types.USERTOKEN, token)
-          var starfs=new Date().getTime();
-          var endds=new Date().getTime();
-          var ks=new Date(starfs).toISOString()+"08:00";
-          var jss=new Date(endds).toISOString()+"08:00";
-
-          var url = this.$store.state.callport + "/api/v1/OnetoOneConference?name="
-          +this.$store.state.Useport.user+"&token="
-          +token+"&begintime="
-          +ks+"&endtime="
-          +jss+"&user="
-          +playVlue+"&session="+ this.$store.state.token;
-          this.$http.get(url).then(res=>{
-               console.log(res)
-               this.l5svideplay();
-          })
-       } ,
      //播放视频
     l5svideplay(){
+          console.log(this.usertoken)
           if (this.h5handler != undefined)
           {    
                this.h5handler.disconnect();
@@ -215,7 +161,7 @@ export default {
                     delete this.v1;
                     this.v1 = undefined;
                     $("#h5sVideoLocal").get(0).load();
-                    $("#h5sVideoLocal").get(0).poster = '';
+                    $("#h5sVideoLocal").get(0).poster = '';  
                 }
                 var audioout=this.audioout
                 var conf1 = {

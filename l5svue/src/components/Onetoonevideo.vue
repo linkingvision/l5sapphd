@@ -74,7 +74,7 @@ export default {
             v1:undefined,
             h5handler:undefined,
             userdata:[],
-            usertoken:userdatatoken,
+            usertoken:this.userdatatoken,
             audioout:'',
             VideoIn:'',
             Bitratess:'',
@@ -82,7 +82,15 @@ export default {
             AudioIn:'',
             chattext:'',
         }
-    },  
+    }, 
+ watch:{
+    userdatatoken:{
+        handler(val,oldval){
+           this.usertoken=val
+        },
+        deep:true
+    }
+ },
  beforeDestroy() {
         if (this.h5handler != undefined)
         {
@@ -99,16 +107,16 @@ export default {
   },
  created(){
       H5sRTCGetCapability(this.UpdateCapability)  
-   },
+     },
   mounted(){
       console.log(this.userdatatoken)
       this.getuser()
       let _this=this
       //  在其他页面传过来拨打的值
-      if(_this.usertoken!=undefined){
-        console.log("播放",this.usertoken)
-        _this.l5svideplay()
-     }
+    //   if(_this.usertoken!=undefined){
+    //     console.log("播放",this.usertoken)
+    //     _this.l5svideplay()
+    //  }
       //  在本页面的拨打过来的值
      _this.$root.bus.$on('meettoken', function(token){
         console.log("播放",token)
@@ -151,10 +159,16 @@ export default {
                 }
             }
         },
-   
+    // 播放 
+    l5splay(){
+        console.log(this.usertoken)
+       if(this.userdatatoken!==null){
+           this.l5svideplay()
+       }
+    },
      //播放视频
     l5svideplay(){
-          console.log(this.userdatatoken)
+          console.log(this.usertoken)
          if (this.h5handler != undefined)
           {    
                this.h5handler.disconnect();
@@ -303,13 +317,16 @@ export default {
                 delete this.h5handler;
                 this.h5handler = undefined;
                 console.log('h5handler')
+                this.$parent.oneToonevue()
+                this.getuser()
+                $("#l5sShadesktop").get(0).poster = '../assets/imgs/blank.png';
             }
             if (this.v1!= undefined)
             {
                 this.v1.disconnect();
                 delete this.v1;
                 this.v1 = undefined;
-                console.log('')
+                this.$parent.oneToonevue()
              }
              console.log('停止')
         }, 

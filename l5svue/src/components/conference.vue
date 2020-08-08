@@ -8,7 +8,7 @@
           </ion-row>
           <ion-row>
               <ion-col size='11'>
-                 <ion-item button detail='false' lines="none" class="urgencybgcitem" @click="urgency()">
+                 <ion-item button detail='false' lines="none" class="urgencybgcitem" @click="mettevent(daterecent.strToken)">
                     <div class="urgencybgc">
                         <ion-label class="conference-itemlabel">
                             <h3>技术交流视频会议</h3>
@@ -96,7 +96,8 @@ mounted(){
                                 $('.joinconference').hide()
                                 this.presentLoading(jointoken)
                                 this.$nextTick(() => {
-                                    this.$emit('Videoconferenceintercom',jointoken)
+                                    // this.$root.bus.$emit('Videoconference', jointoken);
+                                    this.$emit('Videoconference',jointoken)
                                     this.$parent.Videoconferenceintercom()
                                 })
                                

@@ -31,8 +31,9 @@
                                     参会成员
                                 </span>
                                 <el-dropdown-menu slot="dropdown">
-                                    <el-dropdown-item v-for="(item, index) in userdata" :key="index" :command='item'>
-                                        <img src="../assets/imgs/yonghu-10@2x.png" alt="">{{item.strName}}
+                                    <el-dropdown-item v-for="(item, index) in userdataconfer" :key="index" :command='item'>
+                                        <img src="../assets/imgs/yonghu-10@2x.png" alt="">{{item.strName}} 
+                                        <span v-if="item.bOnline" class="online">.在线</span><span v-if="!item.bOnline" class="noonline">.离线</span>
                                     </el-dropdown-item>
                                 </el-dropdown-menu>
                         </el-dropdown>
@@ -68,8 +69,8 @@
                    </ion-list>
                </ion-col>
                <ion-col size='15' class="leftmenu">
-                  <Conference v-if="conferencevalue=='1'"></Conference>
-                  <Videoconferenceintercom v-if="conferencevalue=='Videoconferenceintercom'"></Videoconferenceintercom>
+                  <Conference v-if="conferencevalue=='1'" @Videoconference='mettuserlist'></Conference>
+                  <Videoconferenceintercom v-if="conferencevalue=='Videoconferenceintercom'" ref="linkVideoconference" :videotokeo='userdataconfertoken'></Videoconferenceintercom>
                   <Onetoone v-if="conferencevalue=='2'" ref="linkonetoone" :userdatatoken="usertokens"></Onetoone>
                </ion-col>
              </ion-row>
@@ -110,6 +111,8 @@ export default {
             v1:undefined,
             h5handler:undefined,
             userdata:[],
+            userdataconfer:[],
+            userdataconfertoken:'',
             usertokens:'',
             conferencevalue:'1'
         }
@@ -132,7 +135,7 @@ export default {
       H5sRTCGetCapability(this.UpdateCapability)  
    },
   mounted(){
-      this.getuser() 
+     this.getuser() 
   },
   methods:{
      //  点击打开会议页面
@@ -181,7 +184,6 @@ export default {
             }
          }).catch(()=>console.log('promise catch err'))
       },
-    
     //  拨打视频
     handleCommand(command){
          console.log(command)
@@ -208,11 +210,47 @@ export default {
           +playVlue+"&session="+ this.$store.state.token;
           this.$http.get(url).then(res=>{
                console.log(res)
-               this.$refs.linkonetoone.l5svideplay();
+               this.$refs.linkonetoone.l5splay();
             })
        } ,
-     
-     // 停止 
+       // 列表获取
+    mettuserlist(jointoken){
+         this.userdataconfertoken=jointoken
+         console.log(this.userdataconfertoken)
+         this.mettuselest()
+    },
+       //获取会议成员列表
+    mettuselest(){
+        var url = this.$store.state.callport + "/api/v1/GetParticiant?token="+this.userdataconfertoken+"&session="+ this.$store.state.token;
+        this.$http.get(url).then(result=>{
+            console.log(result)
+            var data=result.data.particiants
+            if(data.length==0){
+                return false
+            }
+            console.log(data)
+            for(var i=0; i<data.length;i++){
+                if(data[i].strToken==this.userdataconfertoken){
+                    continue
+                }
+                var userdata={
+                    mosaicId: data[i].mosaicId,
+                    nSolt: data[i].nSolt,
+                    partId: data[i].partId,
+                    strName: data[i].strName,
+                    strToken: data[i].strToken,
+                    strType: data[i].strType,
+                    bOnline: data[i].bOnline
+                }
+                // if(userdata["strType"]=="device"){
+                //     userdata["icon"]="iconfont icon-shexiangji"
+                // }
+                this.userdataconfer.push(userdata)
+                console.log(this.userdataconfer)
+            }
+        })
+    },  
+    // 停止 
     stop(){
         if (this.h5handler!= undefined)
         {
@@ -278,6 +316,14 @@ ul li{
     margin-right:10px;
 }
 /* 获取在线客户 */
+.online{
+    color:#4dda31;
+    margin-left:10px;
+}
+.noonline{
+    color:#4a4d49;
+    margin-left:10px;
+}
 .onlineuser{
     font-size: 18px;
     height: 100%;
