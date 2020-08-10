@@ -211,6 +211,7 @@ export default {
                     rootpath:'/', // {string} - path of the app running
                     user:this.$store.state.Useport.user, // {string} - user name
                     type:'media', // {string} - media or sharing
+                    // facingmode:"environment", // {string} - user or environment; desktop remove this config
                     audio: audioout,
                     callback: this.PlaybackCB, //Callback for the event
                     userdata: null, // user data

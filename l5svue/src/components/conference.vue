@@ -23,7 +23,7 @@
               </ion-col>
               <ion-col size='5'>
                  <ion-item lines="none" class="rightjioin">
-                     <ion-button class="jioinbutton">加入会议</ion-button>
+                     <ion-button class="jioinbutton" @click='joinconferce()'>加入会议</ion-button>
                  </ion-item>
                  <ion-item lines="none" class="rightjioin">
                      <ion-button color='success' class="jioinbutton" @click="createdconfer()" expand="block">创建会议</ion-button>
@@ -74,14 +74,25 @@ data(){
     } 
 },
 mounted(){
-    this.meetingdata() 
+    this.meetingdata()
+    let _this=this
+    _this.$root.bus.$on('joinmeettoken', function(jointoken){
+        console.log(jointoken)
+        _this.mettevent(jointoken)
+        _this.$parent.joincancelhidden()
+        _this.presentLoading(jointoken)
+    })
+    
 },
  methods: {
    // 创建会议模态框 
    createdconfer(){
         this.$parent.createdModal();
      },
-   
+  // 加入会议模态框   
+   joinconferce(){
+         this.$parent.joinshowModal();
+   },
    //会议开始播放
    mettevent(jointoken){
        var url = this.$store.state.callport + "/api/v1/GetConference?session="+ this.$store.state.token;
@@ -94,11 +105,11 @@ mounted(){
                             if(data[i].bStartStatus){
                                 console.log(data[i].bStartStatus)
                                 $('.joinconference').hide()
-                                this.presentLoading(jointoken)
-                                this.$nextTick(() => {
-                                    // this.$root.bus.$emit('Videoconference', jointoken);
-                                    this.$emit('Videoconference',jointoken)
-                                    this.$parent.Videoconferenceintercom()
+                                let _this=this
+                                _this.$nextTick(() => {
+                                    _this.$emit('Videoconference',jointoken)
+                                    _this.$parent.Videoconferenceintercom()
+                                    // _this.$parent.joinshowModal()
                                 })
                                
                             }else{
@@ -139,6 +150,7 @@ mounted(){
             if(result.status==200){
                 // this.meetdata=result.data.conference
                 console.log(result)
+                 this.meetdata=[];
                 var data=result.data.conference
                 if(data.length==0){
                     return false

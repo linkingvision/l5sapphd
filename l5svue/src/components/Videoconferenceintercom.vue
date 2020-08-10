@@ -81,6 +81,7 @@ export default {
             Resolution:'',
             AudioIn:'',
             chattext:'',
+            camera:''
         }
     }, 
 watch:{
@@ -109,9 +110,22 @@ watch:{
       H5sRTCGetCapability(this.UpdateCapability)  
    },
   mounted(){
-      this.l5svideplay()
+      if(this.usertoken!=undefined){
+            this.l5svideplay()
+            this.showcamer()
+      }
+    let _this=this
+    _this.$root.bus.$on('connection', function(camerdata){
+        console.log(camerdata)
+        _this.camera=camerdata  
+        _this.$parent.cancelluploadinfo()
+        _this.connection()
+    })
   },
   methods:{
+    showcamer(){
+        this.$parent.uploadinfo()
+     },
     // 发送消息
     sendmessage(){
             console.log("消息内容",this.chattext);
@@ -155,6 +169,7 @@ watch:{
       },
       //开启视频
       connection(){
+          console.log(8888888)
             if (this.v1 != undefined)
                 {
                     this.v1.disconnect();
@@ -163,6 +178,7 @@ watch:{
                     $("#h5sVideoLocal").get(0).load();
                     $("#h5sVideoLocal").get(0).poster = '';  
                 }
+                console.log(this.$store.state.camera)
                 var audioout=this.audioout
                 var conf1 = {
                     localvideoid:'h5sVideoLocal', //{string} - id of the local video element tag
@@ -172,6 +188,7 @@ watch:{
                     rootpath:'/', // {string} - path of the app running
                     user:this.$store.state.Useport.user, // {string} - user name
                     type:'media', // {string} - media or sharing
+                    facingmode:this.camera, // {string} - user or environment; desktop remove this config
                     audio: audioout,
                     callback: this.PlaybackCB, //Callback for the event
                     userdata: null, // user data
@@ -179,7 +196,7 @@ watch:{
                     consolelog: 'true' // 'true' or 'false' enable/disable console.log
                 };
                 // return false
-                console.log('******'+conf1)
+                console.log('******'+conf1+this.camera)
                 this.v1 = new H5sRTCPush(conf1);
                 console.log(conf1)
                 console.log("*******",this.VideoCodec,"1*",

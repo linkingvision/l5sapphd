@@ -341,6 +341,7 @@ export default {
                         this.Addparticipants(token,this.token,"device",this.mettmodesize)
                         }
                 }else if(this.token.length==0&&this.user.length==0){
+                        this.$parent.hidden()
                         const toast = document.createElement('ion-toast');
                         toast.color="primary";
                         toast.message = '创建成功';
@@ -354,9 +355,10 @@ export default {
                     this.mettchang(token)
                 }
             }
-            this.$nextTick(() => {
-               this.$router.push('/Conference');
-            })
+            // setTimeout(() => {
+            //     this.$emit('created');
+            //     this.$parent.hidden()
+            // },500)
          })
      },
     
@@ -380,6 +382,10 @@ export default {
             var url = this.$store.state.callport + "/api/v1/StartConference?token="+encodeURIComponent(token)+"&session="+ this.$store.state.token;
             this.$http.get(url).then(result=>{
                 if(result.status==200){
+                    setTimeout(() => {
+                     this.$emit('created');
+                     this.$parent.hidden()
+                    },0)
                     const toast = document.createElement('ion-toast');
                     toast.color="success";
                     toast.message = '会议开始';

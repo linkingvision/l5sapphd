@@ -69,7 +69,7 @@
                    </ion-list>
                </ion-col>
                <ion-col size='15' class="leftmenu">
-                  <Conference v-if="conferencevalue=='1'" @Videoconference='mettuserlist'></Conference>
+                  <Conference v-if="conferencevalue=='1'" @Videoconference='mettuserlist' ref="linkconference"></Conference>
                   <Videoconferenceintercom v-if="conferencevalue=='Videoconferenceintercom'" ref="linkVideoconference" :videotokeo='userdataconfertoken'></Videoconferenceintercom>
                   <Onetoone v-if="conferencevalue=='2'" ref="linkonetoone" :userdatatoken="usertokens"></Onetoone>
                </ion-col>
@@ -80,8 +80,18 @@
        <!--创建会议弹框 -->
        <ion-backdrop stop-propagation="true" class="backdrop" ></ion-backdrop>
        <ion-fab vertical="start" horizontal="start" slot="fixed" class="createdModal">
-                <Modal></Modal>
+                <Modal @created='createdlink'></Modal>
        </ion-fab>
+       <!-- 加入会议弹窗 -->
+        <!-- <ion-backdrop stop-propagation="true" class="backdrop" ></ion-backdrop> -->
+        <ion-fab vertical="start" horizontal="start" slot="fixed" class="Joinconference">
+                <Joinconference></Joinconference>
+        </ion-fab>
+        <!-- 上传视频的弹窗 -->
+        <ion-backdrop stop-propagation="true" class="backdrop" ></ion-backdrop>
+        <ion-fab vertical="start" horizontal="start" slot="fixed" class="camerinfo">
+             <Connection></Connection>
+        </ion-fab>
     </div>
 </template>
 
@@ -98,6 +108,8 @@ import Conference from './conference'
 import Videoconferenceintercom from './Videoconferenceintercom'
 import Onetoone from './Onetoonevideo'
 import Modal from './commonde/modal.vue'
+import Joinconference from './commonde/joinconference.vue'
+import Connection from './commonde/connection'
 export default {
     name: 'Onetoonevideo',
     components: {
@@ -105,6 +117,8 @@ export default {
         Videoconferenceintercom,
         Onetoone,
         Modal,
+        Joinconference,
+        Connection,
     },
     data(){
         return{
@@ -138,6 +152,9 @@ export default {
      this.getuser() 
   },
   methods:{
+    createdlink(){
+      this.$refs.linkconference.meetingdata()
+    },
      //  点击打开会议页面
     conferencebtn(){
         this.conferencevalue='1'
@@ -164,6 +181,27 @@ export default {
     hidden(){
         $('.backdrop').css('display','none')
         $('.createdModal').css('display','none')
+    },
+     //加入会议显示模态框
+     joinshowModal(){
+         $('.backdrop').css('display','block')
+         $('.Joinconference').css('display','block') 
+     },
+     // 取消会议模态框 、
+    joincancelhidden(){
+         $('.backdrop').css('display','none')
+         $('.Joinconference').css('display','none')
+    },
+
+    // 显示上传信息
+    uploadinfo(){
+        $('.backdrop').css('display','block')
+        $('.camerinfo').css('display','block') 
+    },
+       // 取消会议模态框 、
+    cancelluploadinfo(){
+         $('.backdrop').css('display','none')
+         $('.camerinfo').css('display','none')
     },
      //  获取用户信息
     getuser(){
@@ -517,10 +555,11 @@ ul li{
       line-height: 0;
 }
  ion-backdrop {
+      /* z-index:1; */
       opacity: 0.6;
 }
 .backdrop{
-      display: none;
+     display: none;
 }
 .createdModal{
       width:40%;
@@ -531,5 +570,22 @@ ul li{
       z-index: 9999999999999999999999;
       display: none;
 }
-
+.Joinconference{
+      width:30%;
+      height: 30%;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%,-50%);
+      z-index: 9999999999999999999999;
+      display:none;
+}
+.camerinfo{
+      width:30%;
+      height: 25%;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%,-50%);
+      z-index:10001 !important;
+      display:none;
+}
 </style>

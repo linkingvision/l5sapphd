@@ -17,7 +17,8 @@ export default new Vuex.Store({
          token:null,
          users:null,
          protocol:'',
-         usertoken:''
+         usertoken:'',
+         camera:''
     },
     mutations: {
         saveUserList(state,data){ 
@@ -64,6 +65,10 @@ export default new Vuex.Store({
         [types.USERTOKEN]:(state, data) => {
           console.log(data)
           state.usertoken = data
+        },
+        [types.CAMERA]:(state, data) => {
+          console.log(data)
+          state.camera = data
         },
       },
          actions:{},
