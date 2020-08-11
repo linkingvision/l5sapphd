@@ -18,7 +18,8 @@ export default new Vuex.Store({
          users:null,
          protocol:'',
          usertoken:'',
-         camera:''
+         camera:'',
+         userdataconfer:''
     },
     mutations: {
         saveUserList(state,data){ 
@@ -36,7 +37,7 @@ export default new Vuex.Store({
           localStorage.h5stoken = data
           state.token = data
         },
-    
+        
         [types.USEPORTIP]: (state, data) => {
           //console.log("+++++++++++++",data);
           localStorage.h5appportip= data
@@ -69,6 +70,10 @@ export default new Vuex.Store({
         [types.CAMERA]:(state, data) => {
           console.log(data)
           state.camera = data
+        },
+        [types.USERDATACONFER]:(state, data) => {
+          console.log(data)
+          state.userdataconfer = data
         },
       },
          actions:{},

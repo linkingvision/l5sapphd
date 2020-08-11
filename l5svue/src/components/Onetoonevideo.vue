@@ -8,12 +8,15 @@
                     <ion-fab vertical="top" horizontal="start" class="videodesc">
                           <ion-label class="videolabel">
                                <h3>视频对讲研讨会</h3>
-                               <p><span>会议号：{{this.$store.state.usertoken}}</span><span>参会人:王经理</span></p>
+                               <p>
+                                   会议号：<span v-if="usertoken!=null">{{usertoken}}</span><span v-if="usertoken==null">暂无会议</span>
+                                   参会人:<span>王经理</span>
+                               </p>
                           </ion-label>
                     </ion-fab>
                      <!-- left top -->
                     <ion-fab vertical="top" horizontal="end" class="videoleave">
-                          <ion-button class="videobutton" shape="round" @click="stop()">
+                          <ion-button class="videobutton" shape="round" @click="leave()">
                               <ion-label>离开</ion-label>
                           </ion-button>
                     </ion-fab>
@@ -30,10 +33,10 @@
                         <ion-button class="fabbutton" @click="handercall()">
                             <img src="../assets/imgs/audio.png" alt="">
                         </ion-button>
-                        <ion-button class="fabbutton" @click="connection()">
+                        <ion-button class="fabbuttontwo" @click="connection()">
                             <img src="../assets/imgs/camera.png" alt="">
                         </ion-button>
-                        <ion-button class="fabbutton">
+                        <ion-button class="fabbuttonthree">
                             <img src="../assets/imgs/gongxiamg.png" alt="">
                         </ion-button>
                    </ion-fab>
@@ -110,13 +113,7 @@ export default {
      },
   mounted(){
       console.log(this.userdatatoken)
-      this.getuser()
       let _this=this
-      //  在其他页面传过来拨打的值
-    //   if(_this.usertoken!=undefined){
-    //     console.log("播放",this.usertoken)
-    //     _this.l5svideplay()
-    //  }
       //  在本页面的拨打过来的值
      _this.$root.bus.$on('meettoken', function(token){
         console.log("播放",token)
@@ -126,25 +123,6 @@ export default {
            
   },
   methods:{
-     // 获取用户信息
-    getuser(){
-          let slideurl=this.$store.state.callport;
-          let rooturl=slideurl+"/api/v1/GetOnlineUserList?session=" +this.$store.state.token;
-          console.log(rooturl)
-          this.$http.get(rooturl).then(res=>{
-            console.log(res)
-            let useritem=res.data.userList
-            if(res.status==200){
-                let obj={};
-                for(let i=0;i<useritem.length;i++){
-                   if(this.$store.state.Useport.user==useritem[i].strName){
-                      continue
-                   }
-                  this.userdata.push(useritem[i])
-                } 
-               }
-            }).catch(()=>console.log('promise catch err'))
-      },
     // 发送消息
     sendmessage(){
             console.log("消息内容",this.chattext);
@@ -309,7 +287,28 @@ export default {
                     }
                 }
             }
-        }, 
+        },
+        // 离开
+       leave(){
+            if (this.h5handler!= undefined)
+            {
+                this.h5handler.disconnect();
+                delete this.h5handler;
+                this.h5handler = undefined;
+                console.log('h5handler')
+                this.$parent.oneToonevue()
+                this.getuser()
+                $("#l5sShadesktop").get(0).poster = '../assets/imgs/blank.png';
+            }
+            if (this.v1!= undefined)
+            {
+                this.v1.disconnect();
+                delete this.v1;
+                this.v1 = undefined;
+                this.$parent.oneToonevue()
+             }
+             this.$parent.conferencebtn()
+        },
          // 停止 
        stop(){
             if (this.h5handler!= undefined)
@@ -351,9 +350,11 @@ ul li{
 /* 头部 */
 .videodesc{
     left:20px;
+    z-index: 1;
 }
 .videoleave{
     right: 20px;
+    z-index: 1;
 }
 .videobutton{
     margin-top: 20px;
@@ -532,6 +533,7 @@ ul li{
      bottom: 50px;
      left:53%;
      transform: translateX(-50%);
+     z-index: 1;
     }
   .fabbutton{
      --background:transparent;
@@ -540,12 +542,33 @@ ul li{
   }
   .fabbutton img{
      display:block;
-     width:20px;
+     width:18px;
+     height: 22px;
+  }
+  .fabbuttontwo{
+    --background:transparent;
+     --box-shadow:0;
+     margin: 0 10px;
+  }
+  .fabbuttontwo img{
+     display:block;
+     width:25px;
+     height: 20px;
+  }
+  .fabbuttonthree{
+    --background:transparent;
+     --box-shadow:0;
+     margin: 0 10px;
+  }
+  .fabbuttonthree img{
+     display:block;
+     width:25px;
      height: 22px;
   }
   /* 消息发送 */
   .sendnativ{
      bottom: 50px;
+     z-index: 1;
   }
  .nativsend{
     --background: transparent;

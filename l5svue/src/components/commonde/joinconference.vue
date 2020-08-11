@@ -1,27 +1,16 @@
 <template>
     <div class="joinconferce">
         <ion-content class="joincontent">
-            <ion-item lines="none" class="confercenum">
-                <ion-label>会议号</ion-label>
-                <ion-input class="joininput" placeholder="请输入会议号" :value='joinconferencename'  @ionChange="joinconferencename=$event.target.value"></ion-input>
-            </ion-item>
-            <ion-item lines="none" class="confercenum">
-                <ion-label>摄像头</ion-label>
-                <ion-input class="joininput">
-                    <ion-select 
-                       interface="popover" 
-                       class="join-select" 
-                       slot="end" 
-                       :value='cameradata' 
-                       @ionChange="cameradata=$event.target.value">
-                        <ion-select-option class="remor" v-for="(item,index) in camera" :key="index" :value='item.value'>{{item.label}}</ion-select-option>
-                    </ion-select>
-                </ion-input>
-            </ion-item>
-            <ion-item lines="none" class="confercenum">
-                <ion-button slot="start" 	color='secondary'  shape="round" fill="outline" class="cancelbtn" @click="cancelbtn()">取消</ion-button>
-                <ion-button slot="end"  shape="round" class="dongbtn" @click="dongokey()">确定</ion-button>
-            </ion-item>
+            <div class="confercenumposithion">
+                <ion-item lines="none" class="confercenum">
+                    <ion-label>会议号</ion-label>
+                    <ion-input class="joininput" placeholder="请输入会议号" :value='joinconferencename'  @ionChange="joinconferencename=$event.target.value"></ion-input>
+                </ion-item>
+                <ion-item lines="none" class="confercenum">
+                    <ion-button slot="start" color='secondary'  shape="round" fill="outline" class="cancelbtn" @click="cancelbtn()">取消</ion-button>
+                    <ion-button slot="end"  shape="round" class="dongbtn" @click="dongokey()">确定</ion-button>
+                </ion-item>
+            </div>
         </ion-content>
     </div>
 </template>
@@ -48,10 +37,8 @@ export default {
   methods:{
     // 确定加入会议
       dongokey(){
-          console.log(this.cameradata)
-          console.log(this.joinconferencename)
           if(this.joinconferencename!=undefined){
-          this.$store.commit(types.CAMERA, this.cameradata)
+        //   this.$store.commit(types.CAMERA, this.cameradata)
           this.$root.bus.$emit('joinmeettoken', this.joinconferencename);
         }
       },
@@ -106,5 +93,11 @@ export default {
  .dongbtn{
      width: 80px;
      height: 3  0px;
+ }
+ .confercenumposithion{
+    position: absolute;
+    top:50%;
+    left:50%;
+    transform: translate(-50%,-50%);
  }
 </style>

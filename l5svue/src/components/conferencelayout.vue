@@ -8,7 +8,7 @@
                  <ion-label style="--color:#FFFFFF" v-if="conferencevalue=='1'" @click="getuserlist()" >视频会议</ion-label>
                  <ion-label style="--color:#FFFFFF" v-if="conferencevalue=='2'">视频对讲</ion-label>
                  <ion-label style="--color:#FFFFFF" v-if="conferencevalue=='Videoconferenceintercom'">视频会议</ion-label>
-                <ion-button slot="end" class="onlineuser" expand="block" id="ion-button" v-if="conferencevalue=='2'"> 
+                <ion-button slot="end" class="onlineuser" expand="block" id="ion-button" v-if="conferencevalue=='2'" @click="reloaduserlist()"> 
                       <img src="../assets/imgs/yonghu-10@2x.png" alt="">
                       <!-- <ion-label>在线联系人</ion-label> -->
                       <el-dropdown trigger="click"  @command="handleCommand">
@@ -46,18 +46,18 @@
              <ion-row class="leftrow">
                <ion-col size="1" class="leftmenu">
                   <ion-list class="leftlist">
-                        <ion-item lines='none' class="item-left" @click="conferencebtn()">
-                            <ion-button class="leftbtn">
+                        <ion-item lines='none' class="item-left" >
+                            <ion-button class="leftbtn" id="leftbtnone" @click="conferencebtn($event)">
                                <img src="../assets/imgs/menu.png" alt="">
                             </ion-button>
                         </ion-item>
                         <ion-item lines='none' class="item-left"  @click="oneToonevue()">
-                            <ion-button class="leftbtn">
+                            <ion-button class="leftbtn" id="leftbtntwo">
                                <img src="../assets/imgs/onetoone.png" alt="">
                             </ion-button> 
                         </ion-item>
                         <ion-item lines='none' class="item-left" value='3' @click="sendbutton()">
-                            <ion-button class="leftbtn">
+                            <ion-button class="leftbtn" id="leftbtnthree">
                                <img src="../assets/imgs/seting.png" alt="">
                             </ion-button>
                         </ion-item>
@@ -79,18 +79,34 @@
        <ion-footer></ion-footer>
        <!--创建会议弹框 -->
        <ion-backdrop stop-propagation="true" class="backdrop" ></ion-backdrop>
+       
        <ion-fab vertical="start" horizontal="start" slot="fixed" class="createdModal">
                 <Modal @created='createdlink'></Modal>
        </ion-fab>
+       
        <!-- 加入会议弹窗 -->
-        <!-- <ion-backdrop stop-propagation="true" class="backdrop" ></ion-backdrop> -->
         <ion-fab vertical="start" horizontal="start" slot="fixed" class="Joinconference">
-                <Joinconference></Joinconference>
+             <Joinconference></Joinconference>
         </ion-fab>
+        
         <!-- 上传视频的弹窗 -->
-        <ion-backdrop stop-propagation="true" class="backdrop" ></ion-backdrop>
         <ion-fab vertical="start" horizontal="start" slot="fixed" class="camerinfo">
              <Connection></Connection>
+        </ion-fab>
+        
+        <!--onetoone语音对讲弹窗 -->
+        <ion-fab vertical="start" horizontal="start" slot="fixed" class="onetoonemoald">
+            <ion-conten class="onetoonecontentmoadl">
+                <div class="oneTooneposition">
+                    <ion-item class="onetooneconfercenum" lines="none">
+                        <ion-label>确定要呼叫他吗？</ion-label>
+                    </ion-item>
+                    <ion-item lines="none" class="onetooneconfercenum">
+                        <ion-button slot="start" color='secondary'  shape="round" fill="outline" class="onecancelbtn" @click="onetoonecancell()">取消</ion-button>
+                        <ion-button slot="end"  shape="round" class="onecancelbtn" @click="onetoonedongokey()">确定</ion-button>
+                    </ion-item>
+                </div>
+            </ion-conten>
         </ion-fab>
     </div>
 </template>
@@ -128,7 +144,8 @@ export default {
             userdataconfer:[],
             userdataconfertoken:'',
             usertokens:'',
-            conferencevalue:'1'
+            conferencevalue:'1',
+            playVluename:''
         }
     },  
  beforeDestroy() {
@@ -149,24 +166,35 @@ export default {
       H5sRTCGetCapability(this.UpdateCapability)  
    },
   mounted(){
-     this.getuser() 
+     this.getuser()
+     $("#leftbtnone").addClass('newClass') 
   },
   methods:{
     createdlink(){
       this.$refs.linkconference.meetingdata()
     },
      //  点击打开会议页面
-    conferencebtn(){
+    conferencebtn(e){
         this.conferencevalue='1'
-    },
+        
+        $("#leftbtnone").addClass('newClass')
+        $("#leftbtntwo").removeClass('newClass')
+        $("#leftbtnthree").removeClass('newClass')
+     },
      //  点击打开一对一会议
     oneToonevue(){
         this.conferencevalue='2'
         
+        $("#leftbtntwo").addClass('newClass')
+        $("#leftbtnone").removeClass('newClass')
+        $("#leftbtnthree").removeClass('newClass')
     },
      //  点击打开进入设置页面
      sendbutton(){
         this.conferencevalue='3' 
+        $("#leftbtnthree").addClass('newClass')
+        $("#leftbtntwo").removeClass('newClass')
+        $("#leftbtnone").removeClass('newClass')
     },
      // 创建元素的显示
     Videoconferenceintercom(){
@@ -203,13 +231,23 @@ export default {
          $('.backdrop').css('display','none')
          $('.camerinfo').css('display','none')
     },
-     //  获取用户信息
+    // onetoone模态框
+    onetooneshow(){
+        $('.backdrop').css('display','block')
+        $('.onetoonemoald').css('display','block') 
+    },
+    onetoonecancell(){
+         $('.backdrop').css('display','none')
+         $('.onetoonemoald').css('display','none')
+    },
+    //  获取用户信息
     getuser(){
           let slideurl=this.$store.state.callport;
           let rooturl=slideurl+"/api/v1/GetOnlineUserList?session=" +this.$store.state.token;
           console.log(rooturl)
           this.$http.get(rooturl).then(res=>{
             console.log(res)
+            this.userdata=[]
             let useritem=res.data.userList
             if(res.status==200){
                 let obj={};
@@ -222,11 +260,16 @@ export default {
             }
          }).catch(()=>console.log('promise catch err'))
       },
+    //  重新获取在线联系人数据
+    reloaduserlist(){
+        this.getuser()
+    },
     //  拨打视频
     handleCommand(command){
          console.log(command)
          let playVlue=command.strName
-         this.videocall(playVlue)
+         this.playVluename=playVlue
+         this.onetooneshow()
      },
      
     //视频对讲
@@ -263,6 +306,7 @@ export default {
         this.$http.get(url).then(result=>{
             console.log(result)
             var data=result.data.particiants
+            this.userdataconfer=[]
             if(data.length==0){
                 return false
             }
@@ -285,6 +329,7 @@ export default {
                 // }
                 this.userdataconfer.push(userdata)
                 console.log(this.userdataconfer)
+                this.$store.commit(types.USERDATACONFER,this.userdataconfer);
             }
         })
     },  
@@ -441,6 +486,9 @@ ul li{
     --box-shadow:0;
     margin: 0 auto;
 }
+.newClass{
+    --background:#1562FF; 
+}
 /* 右边的col */
 .conference{
     font-size: 18px;
@@ -563,7 +611,7 @@ ul li{
 }
 .createdModal{
       width:40%;
-      height: 80%;
+      height: 75%;
       left: 50%;
       top: 50%;
       transform: translate(-50%,-50%);
@@ -587,5 +635,35 @@ ul li{
       transform: translate(-50%,-50%);
       z-index:10001 !important;
       display:none;
+}
+.onetoonecontentmoadl{
+      --background:#282828;
+}
+.oneTooneposition{
+      position: absolute;
+      top:50%;
+      left:50%;
+      transform: translate(-50%,-50%);
+}
+.onetoonemoald{
+      width:30%;
+      height: 25%;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%,-50%);
+      background-color: #282828;
+      z-index:10001 !important;
+      display:none;
+}
+.onetooneconfercenum{
+    --background:transparent;
+    --color:#FFFFFF ;
+    font-size: 18px;
+    /* margin-bottom:5px; */
+    text-align: center;
+ }
+.onecancelbtn{
+     width: 80px;
+     height: 30px;
 }
 </style>

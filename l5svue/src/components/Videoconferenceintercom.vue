@@ -8,12 +8,15 @@
                     <ion-fab vertical="top" horizontal="start" class="videodesc">
                           <ion-label class="videolabel">
                                <h3>视频对讲研讨会</h3>
-                               <p><span>会议号：{{this.$store.state.usertoken}}</span><span>参会人:王经理</span></p>
+                               <p><span>
+                                   会议号：{{usertoken}}</span>
+                                   参会人:<span v-for="(item,index) in participant" :key="index">{{item.strName}}</span>
+                              </p>
                           </ion-label>
                     </ion-fab>
                      <!-- left top -->
                     <ion-fab vertical="top" horizontal="end" class="videoleave">
-                          <ion-button class="videobutton" shape="round" @click="stop()">
+                          <ion-button class="videobutton" shape="round" @click="leave()">
                               <ion-label>离开</ion-label>
                           </ion-button>
                     </ion-fab>
@@ -30,10 +33,10 @@
                         <ion-button class="fabbutton" @click="handercall()">
                             <img src="../assets/imgs/audio.png" alt="">
                         </ion-button>
-                        <ion-button class="fabbutton" @click="connection()">
+                        <ion-button class="fabbuttontwo" @click="connection()">
                             <img src="../assets/imgs/camera.png" alt="">
                         </ion-button>
-                        <ion-button class="fabbutton">
+                        <ion-button class="fabbuttonthree">
                             <img src="../assets/imgs/gongxiamg.png" alt="">
                         </ion-button>
                    </ion-fab>
@@ -81,7 +84,8 @@ export default {
             Resolution:'',
             AudioIn:'',
             chattext:'',
-            camera:''
+            camera:'',
+            participant:this.$store.state.userdataconfer,
         }
     }, 
 watch:{
@@ -109,10 +113,11 @@ watch:{
  created(){
       H5sRTCGetCapability(this.UpdateCapability)  
    },
-  mounted(){
-      if(this.usertoken!=undefined){
-            this.l5svideplay()
-            this.showcamer()
+ mounted(){
+        console.log(this.participant)
+    if(this.usertoken!=undefined){
+         this.l5svideplay()
+         this.showcamer()
       }
     let _this=this
     _this.$root.bus.$on('connection', function(camerdata){
@@ -286,7 +291,25 @@ watch:{
                     }
                 }
             }
-        }, 
+        },
+        // 离开 
+       leave(){
+            if (this.h5handler!= undefined)
+            {
+                this.h5handler.disconnect();
+                delete this.h5handler;
+                this.h5handler = undefined;
+                console.log('h5handler')
+            }
+            if (this.v1!= undefined)
+            {
+                this.v1.disconnect();
+                delete this.v1;
+                this.v1 = undefined;
+                console.log('')
+             } 
+            this.$parent.conferencebtn()
+       },
          // 停止 
        stop(){
             if (this.h5handler!= undefined)
@@ -325,14 +348,17 @@ ul li{
 /* 头部 */
 .videodesc{
     left:20px;
+    z-index: 1 !important;
 }
 .videoleave{
     right: 20px;
+    z-index: 1 !important;
 }
 .videobutton{
     margin-top: 20px;
     height: 35px;
     font-size: 10px;
+    z-index: 1 !important;
 }
 .videolabel{
     text-align: left;
@@ -506,6 +532,7 @@ ul li{
      bottom: 50px;
      left:53%;
      transform: translateX(-50%);
+     z-index: 1 !important;
     }
   .fabbutton{
      --background:transparent;
@@ -514,12 +541,33 @@ ul li{
   }
   .fabbutton img{
      display:block;
-     width:20px;
+     width:18px;
+     height: 22px;
+  }
+  .fabbuttontwo{
+    --background:transparent;
+     --box-shadow:0;
+     margin: 0 10px;
+  }
+  .fabbuttontwo img{
+     display:block;
+     width:25px;
+     height: 20px;
+  }
+  .fabbuttonthree{
+    --background:transparent;
+     --box-shadow:0;
+     margin: 0 10px;
+  }
+  .fabbuttonthree img{
+     display:block;
+     width:25px;
      height: 22px;
   }
   /* 消息发送 */
   .sendnativ{
-     bottom: 50px;
+    bottom: 50px;
+    z-index: 1 !important;
   }
  .nativsend{
     --background: transparent;

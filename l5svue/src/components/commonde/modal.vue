@@ -251,16 +251,15 @@ export default {
             this.$http.get(createdurl).then(result=>{
               if(result.status==200){
                     var data=result.data.src;
-                    // console.log("***",result);
+                    console.log("***",result);
                     for(var i=0;i<data.length;i++){
                         var Role={
                             value: data[i].strToken,
                             label: data[i].strName
                         }
-
-                        this.tokendata.push(Role);
-                    }
-                }
+                    this.tokendata.push(Role);
+                  }
+               }
             })
             this.conferenceuser()
         },
@@ -285,8 +284,6 @@ export default {
 
     //  创建提交
     createdsubmit(){
-       
-        console.log(this.toppings)
        if(this.Startdate==''||this.Eendate==''){
         // this.$message('时间不能为空');
         const toast = document.createElement('ion-toast');
@@ -341,6 +338,10 @@ export default {
                         this.Addparticipants(token,this.token,"device",this.mettmodesize)
                         }
                 }else if(this.token.length==0&&this.user.length==0){
+                     if(this.toppings){
+                        this.mettchang(token)
+                     }else{
+                        this.$emit('created');
                         this.$parent.hidden()
                         const toast = document.createElement('ion-toast');
                         toast.color="primary";
@@ -349,16 +350,9 @@ export default {
                         toast.duration = 2000;
                         document.body.appendChild(toast);
                         toast.present();
+                     }
                  }
-                 console.log(this.toppings)
-                if(this.toppings){
-                    this.mettchang(token)
-                }
             }
-            // setTimeout(() => {
-            //     this.$emit('created');
-            //     this.$parent.hidden()
-            // },500)
          })
      },
     
@@ -371,29 +365,42 @@ export default {
                 "&type="+pattern+
                 "&session="+ this.$store.state.token;
                 this.$http.get(url).then(result=>{
-                      console.log('添加成功')
-                   // this.$message(successfully);
+                    if(this.toppings){
+                      this.mettchang(token)
+                      console.log(token)
+                    }else{
+                    //  更新
+                     this.$emit('created');
+                    //  隐藏
+                     this.$parent.hidden()
+                      const toast = document.createElement('ion-toast');
+                     toast.color="primary";
+                     toast.message = '创建成功';
+                     toast.position = 'top';
+                     toast.duration = 2000;
+                     document.body.appendChild(toast);
+                     toast.present();
+                  }
               })
           }
       },
 
      //开启会议
     mettchang(token){
+            console.log(token)
             var url = this.$store.state.callport + "/api/v1/StartConference?token="+encodeURIComponent(token)+"&session="+ this.$store.state.token;
             this.$http.get(url).then(result=>{
                 if(result.status==200){
-                    setTimeout(() => {
                      this.$emit('created');
                      this.$parent.hidden()
-                    },0)
-                    const toast = document.createElement('ion-toast');
-                    toast.color="success";
-                    toast.message = '会议开始';
-                    toast.position = 'top';
-                    toast.duration = 2000;
-                    document.body.appendChild(toast);
-                    toast.present();
-                }
+                     const toast = document.createElement('ion-toast');
+                     toast.color="success";
+                     toast.message = '会议开始';
+                     toast.position = 'top';
+                     toast.duration = 2000;
+                     document.body.appendChild(toast);
+                     toast.present();
+              }
           })
        },
     // 取消创建
@@ -411,10 +418,13 @@ export default {
     background-color: rgb(32, 31, 31);
 }
 .created-header-toolbar{
-    --background:#161616;
+    --background:#282828;
     text-align: left;
     font-size: 20px;
     --min-height:50px;
+}
+.header-md:after{
+    height: 0;
 }
 .created-title{
     --color:#9A9A9A;
@@ -422,17 +432,17 @@ export default {
     font-size: 20px;
   }
 .created-content{
-    --background:#161616;
+    --background:#282828;
     --padding-start:25px;
     --padding-end:25px;
 }
 .created-item{
-    --background:#161616;
+    --background:#282828;
     --color:#FFFFFF;
     --min-height:50px;
 }
 .created-switchitem{
-   --background:#161616;
+   --background:#282828;
     --color:#FFFFFF;
     width: 280px;
     margin-bottom: 5px;
@@ -445,20 +455,20 @@ export default {
     border-radius: 8px;
     margin-left: 30px;
     --color:#9A9A9A;
-    font-size: 8px;
+    font-size: 16px;
 }
 .created-label{
-    font-size:20px;
-    font-weight: 600;
+    font-size:18px;
+    font-weight: 500;
 }
 .created-labelresolution{
-    font-size:20px;
-    font-weight: 600;
+    font-size:18px;
+    font-weight: 500;
     /* margin-left: 35px;; */
 }
 .created-selectlabel{
-    font-size:20px;
-    font-weight: 600;
+    font-size:18px;
+    font-weight: 500;
     /* width: 100px;; */
 }
 .created-datetime{
@@ -467,20 +477,20 @@ export default {
 }
 .moshi-one{
     color:#FFFFFF;
-    font-size:20px;
-    font-weight: 600;
+    font-size:18px;
+    font-weight: 500;
     margin-right: 50px;
 }
 .moshi{
     color:#FFFFFF;
-    font-size:20px;
-    font-weight: 600;
+    font-size:18px;
+    font-weight: 500;
 }
 .moshi:nth-child(1){
     margin-right:50px;
 }
 .moshigrid{
-    margin: 10px 0;
+    margin:0;
 }
 .cread-checkbox{
     vertical-align: middle;

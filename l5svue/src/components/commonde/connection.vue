@@ -1,23 +1,25 @@
 <template>
     <div class="joinconferce">
         <ion-content class="joincontent">
-            <ion-item lines="none" class="confercenum">
-                <ion-label>摄像头</ion-label>
-                <ion-input class="joininput">
-                    <ion-select 
-                       interface="popover" 
-                       class="join-select" 
-                       slot="end" 
-                       :value='cameradata' 
-                       @ionChange="cameradata=$event.target.value">
-                        <ion-select-option class="remor" v-for="(item,index) in camera" :key="index" :value='item.value'>{{item.label}}</ion-select-option>
-                    </ion-select>
-                </ion-input>
-            </ion-item>
-            <ion-item lines="none" class="confercenum">
-                <ion-button slot="start" 	color='secondary'  shape="round" fill="outline" class="cancelbtn" @click="cancelbtn()">取消</ion-button>
-                <ion-button slot="end"  shape="round" class="dongbtn" @click="dongokey()">确定</ion-button>
-            </ion-item>
+            <div class="confercenumposithion">
+                <ion-item lines="none" class="confercenum">
+                    <ion-label>摄像头</ion-label>
+                    <ion-input class="joininput">
+                        <ion-select 
+                        interface="popover" 
+                        class="join-select" 
+                        slot="end" 
+                        :value='cameradata' 
+                        @ionChange="cameradata=$event.target.value">
+                            <ion-select-option class="remor" v-for="(item,index) in camera" :key="index" :value='item.value'>{{item.label}}</ion-select-option>
+                        </ion-select>
+                    </ion-input>
+                </ion-item>
+                <ion-item lines="none" class="confercenum">
+                    <ion-button slot="start" 	color='secondary'  shape="round" fill="outline" class="cancelbtn" @click="cancelbtn()">取消</ion-button>
+                    <ion-button slot="end"  shape="round" class="dongbtn" @click="dongokey()">确定</ion-button>
+                </ion-item>
+            </div>
         </ion-content>
     </div>
 </template>
@@ -45,7 +47,7 @@ export default {
       dongokey(){
           console.log(this.cameradata)
           if(this.cameradata!=undefined){
-          this.$root.bus.$emit('connection', this.cameradata);
+            this.$root.bus.$emit('connection', this.cameradata);
         }
       },
     //   取消会议
@@ -99,5 +101,10 @@ export default {
  .dongbtn{
      width: 80px;
      height: 30px;
+ }
+.confercenumposithion{
+    position: absolute;
+    top:50%;
+    transform: translateY(-50%);
  }
 </style>

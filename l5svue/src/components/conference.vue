@@ -35,27 +35,31 @@
                   <ion-label>待办会议</ion-label>
               </ion-col>
           </ion-row>
-          <ion-row>
-              <ion-col size='4' class="colbacklog" v-for="(item,index) in meetdata" :key="index">
-                   <ion-item class="conference-action-item" button lines="none" detail='false'  @click="mettevent(item.strToken)">
-                          <ion-label class="action-label">
-                                <h3 >L5S会议平台</h3>
-                                <p>技术交流视频会议</p>
-                                <h4>日期:{{item.beginTime}}<span>会议号：{{item.strToken}}</span></h4>
-                                <h4 class="jioninbuttons">
-                                    <span class="inlineblock"></span><span>定期会议</span> 
-                                </h4>
-                           </ion-label>
-                        <ion-note slot="end" class="boting" color='success' v-if="item.bStartStatus">..进行中</ion-note>
-                        <ion-note slot="end" class="boting" color='primary' v-if="!item.bStartStatus">筹备中</ion-note>
-                        <ion-fab vertical="bottom" horizontal="end" class="actrion-button">
-                            <ion-button fill="outline" class="joinconference" v-if="!item.bStartStatus">等待会议</ion-button>
-                            <ion-button  class="joinconference" v-if="item.bStartStatus">加入会议</ion-button>
-                        </ion-fab>
-                  </ion-item>
-              </ion-col>
-          </ion-row>
-      </ion-grid>
+        </ion-grid>
+        <ion-content class="conferlist">
+            <ion-grid>
+                <ion-row>
+                    <ion-col size='4' class="colbacklog" v-for="(item,index) in meetdata" :key="index">
+                        <ion-item class="conference-action-item" button lines="none" detail='false'  @click="mettevent(item.strToken)">
+                                <ion-label class="action-label">
+                                        <h3 >L5S会议平台</h3>
+                                        <p>技术交流视频会议</p>
+                                        <h4>日期:{{item.beginTime}}<span>会议号：{{item.strToken}}</span></h4>
+                                        <h4 class="jioninbuttons">
+                                            <span class="inlineblock"></span><span>定期会议</span> 
+                                        </h4>
+                                </ion-label>
+                                <ion-note slot="end" class="boting" color='success' v-if="item.bStartStatus">..进行中</ion-note>
+                                <ion-note slot="end" class="boting" color='primary' v-if="!item.bStartStatus">筹备中</ion-note>
+                                <ion-fab vertical="bottom" horizontal="end" class="actrion-button">
+                                    <ion-button fill="outline" class="joinconference" v-if="!item.bStartStatus">等待会议</ion-button>
+                                    <ion-button  class="joinconference" v-if="item.bStartStatus">加入会议</ion-button>
+                                </ion-fab>
+                        </ion-item>
+                    </ion-col>
+                </ion-row>
+            </ion-grid>
+        </ion-content>
     </div>
 </template>
 <script>
@@ -95,7 +99,8 @@ mounted(){
    },
    //会议开始播放
    mettevent(jointoken){
-       var url = this.$store.state.callport + "/api/v1/GetConference?session="+ this.$store.state.token;
+       console.log(jointoken)
+     var url = this.$store.state.callport + "/api/v1/GetConference?session="+ this.$store.state.token;
             this.$http.get(url).then(result=>{
                 if(result.status==200){
                     console.log(result)
@@ -339,5 +344,8 @@ mounted(){
     font-size: 12px !important;
     font-weight: 600;
 }
-
+.conferlist{
+    height:55%;
+    --background:transparent;
+}
 </style>
