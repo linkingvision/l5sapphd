@@ -1,6 +1,6 @@
 <template>
    <div class="Onetoonevideo">
-        <eventLists></eventLists>
+        <eventLists @meettoken='meettokenchild'></eventLists>
        <ion-header>
           <ion-toobar>
             <ion-item class="flatheader">
@@ -70,8 +70,8 @@
                </ion-col>
                <ion-col size='15' class="leftmenu">
                   <Conference v-if="conferencevalue=='1'" @Videoconference='mettuserlist' ref="linkconference"></Conference>
-                  <Videoconferenceintercom v-if="conferencevalue=='Videoconferenceintercom'" ref="linkVideoconference" :videotokeo='userdataconfertoken'></Videoconferenceintercom>
-                  <Onetoone v-if="conferencevalue=='2'" ref="linkonetoone" :userdatatoken="usertokens"></Onetoone>
+                  <Videoconferenceintercom v-if="conferencevalue=='Videoconferenceintercom'" ref="linkVideoconference" :videotokeo='userdataconfertoken' :userdataconferpro='userdataconfer'></Videoconferenceintercom>
+                  <Onetoone v-if="conferencevalue=='2'" ref="linkonetoone" :userdatatoken="usertokens" :playusername='playvideoprops' :struuiname='struuid'></Onetoone>
                </ion-col>
              </ion-row>
           </ion-grid> 
@@ -99,7 +99,7 @@
             <ion-conten class="onetoonecontentmoadl">
                 <div class="oneTooneposition">
                     <ion-item class="onetooneconfercenum" lines="none">
-                        <ion-label>确定要呼叫他吗？</ion-label>
+                        <ion-label>确定要呼叫<span style="color:#67C23A;">{{playVluename}}</span>吗？</ion-label>
                     </ion-item>
                     <ion-item lines="none" class="onetooneconfercenum">
                         <ion-button slot="start" color='secondary'  shape="round" fill="outline" class="onecancelbtn" @click="onetoonecancell()">取消</ion-button>
@@ -145,7 +145,9 @@ export default {
             userdataconfertoken:'',
             usertokens:'',
             conferencevalue:'1',
-            playVluename:''
+            playVluename:'',
+            playvideoprops:'',
+            struuid:''
         }
     },  
  beforeDestroy() {
@@ -196,7 +198,7 @@ export default {
         $("#leftbtntwo").removeClass('newClass')
         $("#leftbtnone").removeClass('newClass')
     },
-     // 创建元素的显示
+     // 进入会议页面的显示
     Videoconferenceintercom(){
         this.conferencevalue='Videoconferenceintercom' 
     },
@@ -271,13 +273,29 @@ export default {
          this.playVluename=playVlue
          this.onetooneshow()
      },
-     
+    //  确定拨打
+    onetoonedongokey(){
+          this.onetoonecancell()
+          let playparit=this.playVluename
+          this.playvideoprops=playparit
+          this.$refs.linkonetoone.anewuser()
+          console.log(this.playvideoprops)
+          this.videocall(this.playVluename)
+    },
+    // 打过来的数据
+    meettokenchild(meettoken){
+        for(var i=0; i<meettoken.length;i++){
+            console.log(meettoken[0],meettoken[1])
+            this.usertokens=meettoken[0]
+            this.struuid=meettoken[1]
+        }
+    },
     //视频对讲
     videocall(playVlue){
           console.log(playVlue)
           var token = uuid(4, 10);
           this.usertokens=token
-          this.$store.commit(types.USERTOKEN, token)
+        //   this.$store.commit(types.USERTOKEN, playVlue)
           var starfs=new Date().getTime();
           var endds=new Date().getTime();
           var ks=new Date(starfs).toISOString()+"08:00";
@@ -292,7 +310,7 @@ export default {
           this.$http.get(url).then(res=>{
                console.log(res)
                this.$refs.linkonetoone.l5splay();
-            })
+           })
        } ,
        // 列表获取
     mettuserlist(jointoken){
@@ -329,28 +347,21 @@ export default {
                 // }
                 this.userdataconfer.push(userdata)
                 console.log(this.userdataconfer)
-                this.$store.commit(types.USERDATACONFER,this.userdataconfer);
             }
         })
     },  
     // 停止 
     stop(){
-        if (this.h5handler!= undefined)
-        {
-            this.h5handler.disconnect();
-            delete this.h5handler;
-            this.h5handler = undefined;
-            console.log('h5handler')
-         }
-        if (this.v1!= undefined)
-        {
-            this.v1.disconnect();
-            delete this.v1;
-            this.v1 = undefined;
-            console.log('')
-            }
-            console.log('停止')
-        }, 
+        if(this.conferencevalue=='1'){
+            this.$refs.linkconference.onetonestop()
+        }
+        if(this.conferencevalue=='2'){
+            this.$refs.linkonetoone.onetonestop()
+        }
+        if(this.conferencevalue=='Videoconferenceintercom'){
+            this.$refs.linkVideoconference.onetonestop()
+        }
+       }, 
     }
 }
 </script>

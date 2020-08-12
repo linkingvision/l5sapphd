@@ -216,6 +216,10 @@ mounted(){
     addZero(n){
             return n<10?"0"+n:n;
       }, 
+    // 退出  
+    onetonestop(){
+         this.$router.push('/Flatlogin')
+    },
   }
 }
 </script>

@@ -15,6 +15,7 @@ export default {
 		      sharedstart:undefined,
 		      sharedstop:undefined, 
           el:undefined,
+          struuid:undefined
        }
    },
   beforeDestroy() {
@@ -35,7 +36,10 @@ export default {
      // 视频播放
      l5svideplay(){
         if(this.meettoken!=undefined){
-           this.$root.bus.$emit('meettoken', this.meettoken);
+          //  this.$root.bus.$emit('meettoken', this.meettoken);
+           this.$emit('meettoken',[this.meettoken,this.struuid])
+           console.log(this.struuid)
+           this.$parent.oneToonevue()
         }
      },
        //会议通知弹窗    
@@ -92,6 +96,7 @@ export default {
             console.log("****",msgevent)
 			if(msgevent.type=="H5S_EVENT_SEND_CONFERENCE"){
                 this.meettoken=msgevent.sendConference.token;
+                this.struuid=msgevent.strUUID
                 console.log("****",msgevent)
                 this.presentAlertConfirm()
       }else if(msgevent.type=="H5S_EVENT_START_SHARE_DESKTOP"){

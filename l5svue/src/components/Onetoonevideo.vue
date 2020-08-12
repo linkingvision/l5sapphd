@@ -8,9 +8,14 @@
                     <ion-fab vertical="top" horizontal="start" class="videodesc">
                           <ion-label class="videolabel">
                                <h3>视频对讲研讨会</h3>
-                               <p>
-                                   会议号：<span v-if="usertoken!=null">{{usertoken}}</span><span v-if="usertoken==null">暂无会议</span>
-                                   参会人:<span>王经理</span>
+                               <p class="videop">
+                                   会议号：<span id="spanconfrentertittle" :style="{'color':usertoken!=''?'#67C23A':'#F56C6C'}">
+                                       {{usertoken!=''? usertoken:'暂无会议'}}
+                                   </span>
+                                   参会人:<span id="playname" :style="{'color':playusernameonetoone!=''?'#67C23A':'#F56C6C'}">
+                                       {{playusernameonetoone!=''? playusernameonetoone:this.struuinameprop==this.$store.state.Useport.user?'正在接入':'请选择参会人'}}
+                                   </span>
+                                   <!-- <span id="playname" style="color:#67C23A" v-if="struuinameprop=''">正在获取参会人名字...</span> -->
                                </p>
                           </ion-label>
                     </ion-fab>
@@ -71,28 +76,42 @@ import {H5sPlayerWS,H5sPlayerHls,H5sPlayerRTC,H5sRTCGetCapability,H5sPlayerAudBa
 import * as types from '@/vuex/types'
 export default {
     name: 'Onetoonevideo',
-    props:["userdatatoken"],
+    props:["userdatatoken","playusername",'struuiname'],
     data(){
         return{
             v1:undefined,
             h5handler:undefined,
             userdata:[],
             usertoken:this.userdatatoken,
+            playusernameonetoone:this.playusername,
             audioout:'',
             VideoIn:'',
             Bitratess:'',
             Resolution:'',
             AudioIn:'',
             chattext:'',
+            struuinameprop:this.struuiname
         }
     }, 
  watch:{
-    userdatatoken:{
+   playusername:{
+        handler(val,oldval){
+           this.playusernameonetoone=val
+        },
+        deep:true
+    },
+   userdatatoken:{
         handler(val,oldval){
            this.usertoken=val
         },
         deep:true
-    }
+    },
+    struuiname:{
+        handler(val,oldval){
+           this.struuinameprop=val
+        },
+        deep:true
+    },
  },
  beforeDestroy() {
         if (this.h5handler != undefined)
@@ -100,31 +119,41 @@ export default {
             this.h5handler.disconnect();
             delete this.h5handler;
             this.h5handler = undefined;
+            this.$store.commit(types.USERTOKEN, '')
+            this.struuinameprop=''
         }
         if (this.v1 != undefined)
         {
             this.v1.disconnect();
             delete this.v1;
             this.v1 = undefined;
+            this.playusernameonetoone=''
+            this.struuinameprop=''
         }
   },
  created(){
-      H5sRTCGetCapability(this.UpdateCapability)  
+      H5sRTCGetCapability(this.UpdateCapability) 
+      if(this.struuinameprop==this.$store.state.Useport.user){
+            console.log(this.struuinameprop)
+        }else{
+            this.usertoken=''
+            this.playusernameonetoone=''
+        }
+    
      },
   mounted(){
       console.log(this.userdatatoken)
       let _this=this
       //  在本页面的拨打过来的值
-     _this.$root.bus.$on('meettoken', function(token){
-        console.log("播放",token)
-        _this.usertoken=token   
-        _this.l5svideplay()
-     });
-           
-  },
+      if(_this.usertoken!=''){
+          _this.l5svideplay()
+      }
+   },
   methods:{
     // 发送消息
     sendmessage(){
+            console.log(this.playusernameonetoone)
+            return false
             console.log("消息内容",this.chattext);
             if (this.v1 != undefined)
             {
@@ -137,9 +166,16 @@ export default {
                 }
             }
         },
+    // 重新赋值
+    anewuser(){
+       if(this.playusernameonetoone==''){
+          this.playusernameonetoone=this.playusername
+          console.log( this.playusernameonetoone)
+       }
+    },
     // 播放 
     l5splay(){
-        console.log(this.usertoken)
+       console.log(this.usertoken)
        if(this.userdatatoken!==null){
            this.l5svideplay()
        }
@@ -297,7 +333,6 @@ export default {
                 this.h5handler = undefined;
                 console.log('h5handler')
                 this.$parent.oneToonevue()
-                this.getuser()
                 $("#l5sShadesktop").get(0).poster = '../assets/imgs/blank.png';
             }
             if (this.v1!= undefined)
@@ -310,23 +345,24 @@ export default {
              this.$parent.conferencebtn()
         },
          // 停止 
-       stop(){
+       onetonestop(){
             if (this.h5handler!= undefined)
             {
                 this.h5handler.disconnect();
                 delete this.h5handler;
                 this.h5handler = undefined;
-                console.log('h5handler')
-                this.$parent.oneToonevue()
-                this.getuser()
-                $("#l5sShadesktop").get(0).poster = '../assets/imgs/blank.png';
+                this.usertoken='';
+                this.playusernameonetoone=''
+                this.struuinameprop=''
             }
             if (this.v1!= undefined)
             {
                 this.v1.disconnect();
                 delete this.v1;
                 this.v1 = undefined;
-                this.$parent.oneToonevue()
+                this.usertoken='';
+                this.playusernameonetoone=''
+                this.struuinameprop=''
              }
              console.log('停止')
         }, 
@@ -351,6 +387,18 @@ ul li{
 .videodesc{
     left:20px;
     z-index: 1;
+}
+.videodesc .videop{
+    font-size:10px;
+    font-weight: 600;
+}
+#spanconfrentertittle{
+    font-weight: 500;
+    font-size: 8px;
+}
+#playname{
+    font-weight: 500;
+    font-size:8px;
 }
 .videoleave{
     right: 20px;
@@ -591,8 +639,7 @@ ul li{
       height: 100%;
       --border-radius:0 10px 10px 0;
     }
-   .sendbutton p{
+  .sendbutton p{
       line-height: 0;
-      
-   }
+ }
 </style>

@@ -10,7 +10,7 @@
                                <h3>视频对讲研讨会</h3>
                                <p><span>
                                    会议号：{{usertoken}}</span>
-                                   参会人:<span v-for="(item,index) in participant" :key="index">{{item.strName}}</span>
+                                   参会人: <span v-for="(item,index) in participant" :key="index" :style="{'color':item.bOnline?'#67C23A':'white'}" >{{item.strName}}, </span>
                               </p>
                           </ion-label>
                     </ion-fab>
@@ -71,7 +71,7 @@ import {H5sPlayerWS,H5sPlayerHls,H5sPlayerRTC,H5sRTCGetCapability,H5sPlayerAudBa
 import * as types from '@/vuex/types'
 export default {
     name: 'Videoconferenceintercom',
-    props:["videotokeo"],
+    props:["videotokeo",'userdataconferpro'],
     data(){
         return{
             v1:undefined,
@@ -85,13 +85,19 @@ export default {
             AudioIn:'',
             chattext:'',
             camera:'',
-            participant:this.$store.state.userdataconfer,
+            participant:this.userdataconferpro
         }
     }, 
 watch:{
     videotokeo:{
         handler(val,oldval){
            this.usertoken=val
+        },
+        deep:true
+    },
+    userdataconferpro:{
+         handler(val,oldval){
+           this.participant=val
         },
         deep:true
     }
@@ -311,19 +317,21 @@ watch:{
             this.$parent.conferencebtn()
        },
          // 停止 
-       stop(){
+       onetonestop(){
             if (this.h5handler!= undefined)
             {
                 this.h5handler.disconnect();
                 delete this.h5handler;
                 this.h5handler = undefined;
                 console.log('h5handler')
+                // this.$router.push('/Flatlogin');
             }
             if (this.v1!= undefined)
             {
                 this.v1.disconnect();
                 delete this.v1;
                 this.v1 = undefined;
+                // this.$router.push('/Flatlogin')
                 console.log('')
              }
              console.log('停止')
