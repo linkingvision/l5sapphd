@@ -7,7 +7,7 @@
                      <!-- left top -->
                     <ion-fab vertical="top" horizontal="start" class="videodesc">
                           <ion-label class="videolabel">
-                               <h3>视频对讲研讨会</h3>
+                               <h3>{{this.$parent.createdconferencename}}</h3> 
                                <p><span>
                                    会议号：{{usertoken}}</span>
                                    参会人: <span v-for="(item,index) in participant" :key="index" :style="{'color':item.bOnline?'#67C23A':'white'}" >{{item.strName}}, </span>
@@ -117,21 +117,32 @@ watch:{
         }
   },
  created(){
-      H5sRTCGetCapability(this.UpdateCapability)  
+      H5sRTCGetCapability(this.UpdateCapability)
+        if (this.h5handler != undefined)
+        {
+            this.h5handler.disconnect();
+            delete this.h5handler;
+            this.h5handler = undefined;
+        }
+        if (this.v1 != undefined)
+        {
+            this.v1.disconnect();
+            delete this.v1;
+            this.v1 = undefined;
+        }  
    },
  mounted(){
-        console.log(this.participant)
+    console.log(this.participant)
     if(this.usertoken!=undefined){
-         this.l5svideplay()
-         this.showcamer()
+        this.showcamer()
       }
     let _this=this
     _this.$root.bus.$on('connection', function(camerdata){
         console.log(camerdata)
         _this.camera=camerdata  
         _this.$parent.cancelluploadinfo()
-        _this.connection()
-    })
+        _this.l5svideplay()
+     })
   },
   methods:{
     showcamer(){
@@ -155,12 +166,20 @@ watch:{
     l5svideplay(){
           console.log(this.usertoken)
           if (this.h5handler != undefined)
-          {    
-               this.h5handler.disconnect();
-               delete this.h5handler;
-               this.h5handler = undefined;
-          }
-        //   console.log(playid,token,streamprofile)
+            {
+                this.h5handler.disconnect();
+                this.h5handler = undefined;
+                delete this.h5handler;
+            }
+            if (this.v1 != undefined)
+            {
+                this.v1.disconnect();
+                this.v1 = undefined;
+                delete this.v1;
+            }  
+          $('.sendbutton').addClass('sendbuttonplay')
+          $('.videobutton').addClass('sendbuttonplay')
+           //   console.log(playid,token,streamprofile)
           let conf = {
                videoid:"h5sVideoRemote",
                protocol:this.$store.state.protocol, //http: or https:
@@ -175,21 +194,26 @@ watch:{
             
             this.h5handler = new H5sPlayerWS(conf);
             this.h5handler.connect( );
-            
-            // this.connection()
-      },
+            // setInterval(()=>{
+                  this.connection()
+            // },2000)
+        },
       //开启视频
       connection(){
           console.log(8888888)
-            if (this.v1 != undefined)
+            if (this.h5handler != undefined)
                 {
-                    this.v1.disconnect();
-                    delete this.v1;
-                    this.v1 = undefined;
-                    $("#h5sVideoLocal").get(0).load();
-                    $("#h5sVideoLocal").get(0).poster = '';  
+                    this.h5handler.disconnect();
+                    this.h5handler = undefined;
+                    delete this.h5handler;
                 }
-                console.log(this.$store.state.camera)
+                if (this.v1 != undefined)
+               {
+                   this.v1.disconnect();
+                   this.v1 = undefined;
+                   delete this.v1;
+                 }  
+                console.log(this.camera)
                 var audioout=this.audioout
                 var conf1 = {
                     localvideoid:'h5sVideoLocal', //{string} - id of the local video element tag
@@ -536,7 +560,7 @@ ul li{
   .footerbtn{
      width:291px;
      height:50px;
-     background-color:#1B181C;
+     background-color:rgba(95, 93, 93, 0.301);
      bottom: 50px;
      left:53%;
      transform: translateX(-50%);
@@ -586,7 +610,7 @@ ul li{
     --inner-padding-end:0;
     }
   .sendinput{
-    --background:#1B181C;
+    --background:rgba(95, 93, 93, 0.301);
     /* --padding-top:3px;
     --padding-bottom:3px; */    
     --padding-start:8px !important;
@@ -600,6 +624,8 @@ ul li{
     }
    .sendbutton p{
       line-height: 0;
-      
-   }
+ }
+  .sendbuttonplay{
+     --background:rgba(32, 130, 241, 0.3);
+  }
 </style>

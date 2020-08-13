@@ -7,7 +7,7 @@
                     <ion-input class="joininput" placeholder="请输入会议号" :value='joinconferencename'  @ionChange="joinconferencename=$event.target.value"></ion-input>
                 </ion-item>
                 <ion-item lines="none" class="confercenum">
-                    <ion-button slot="start" color='secondary'  shape="round" fill="outline" class="cancelbtn" @click="cancelbtn()">取消</ion-button>
+                    <ion-button slot="start" color='#0B62FF'  shape="round" fill="outline" class="cancelbtn" @click="cancelbtn()">取消</ion-button>
                     <ion-button slot="end"  shape="round" class="dongbtn" @click="dongokey()">确定</ion-button>
                 </ion-item>
             </div>

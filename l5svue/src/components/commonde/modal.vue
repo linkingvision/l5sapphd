@@ -121,7 +121,7 @@
                 </ion-toggle>
           </ion-item>
           <ion-item lines="none" class="created-item">
-              <ion-button slot="start" 	color='secondary'  shape="round" fill="outline" class="createdsubmit" @click="cancellcreated()">取消</ion-button>
+              <ion-button slot="start" 	color='#0B62FF'  shape="round" fill="outline" class="createdsubmit" @click="cancellcreated()">取消</ion-button>
               <ion-button slot="end"  shape="round" class="createdsubmit" @click="createdsubmit()">创建</ion-button>
           </ion-item>
       </ion-content>
@@ -135,7 +135,7 @@ export default {
       return{
          ocnferencename: 'Conference1',//名称
          Startdate: new Date(),//时间
-         Eendate: new Date(),//时间
+         Eendate: '',//时间
          pattern:'user',
          patterns:'apple',
          user:'',//成员
@@ -242,7 +242,11 @@ export default {
       }
    },
   mounted(){
-   this.cretedstart()
+        this.cretedstart()
+        var starfs=new Date(this.Startdate).getTime();
+        var endds=new Date(this.Startdate).getTime()+3600*1000
+        var startss=new Date(endds)
+        this.Eendate=startss
   },
   methods:{
     // 初始创建会议的页面

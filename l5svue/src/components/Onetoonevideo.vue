@@ -119,7 +119,6 @@ export default {
             this.h5handler.disconnect();
             delete this.h5handler;
             this.h5handler = undefined;
-            this.$store.commit(types.USERTOKEN, '')
             this.struuinameprop=''
         }
         if (this.v1 != undefined)
@@ -144,6 +143,12 @@ export default {
   mounted(){
       console.log(this.userdatatoken)
       let _this=this
+      _this.$root.bus.$on('meettoken',function(token,struuid){
+          console.log(token)
+          _this.usertoken=token
+          _this.struuinameprop=struuid
+          _this.l5splay()
+      })
       //  在本页面的拨打过来的值
       if(_this.usertoken!=''){
           _this.l5svideplay()
@@ -189,7 +194,7 @@ export default {
                delete this.h5handler;
                this.h5handler = undefined;
           }
-        //   console.log(playid,token,streamprofile)
+          //   console.log(playid,token,streamprofile)
           let conftoken=this.usertoken
           let conf = {
                videoid:"h5sVideoRemote",
@@ -577,7 +582,7 @@ ul li{
   .footerbtn{
      width:291px;
      height:50px;
-     background-color:#1B181C;
+     background-color:rgba(95, 93, 93, 0.301);
      bottom: 50px;
      left:53%;
      transform: translateX(-50%);
@@ -627,9 +632,7 @@ ul li{
     --inner-padding-end:0;
     }
   .sendinput{
-    --background:#1B181C;
-    /* --padding-top:3px;
-    --padding-bottom:3px; */    
+    --background:rgba(95, 93, 93, 0.301);   
     --padding-start:8px !important;
     border-radius:10px 0 0 10px;
      --color:#FFFFFF;
@@ -639,6 +642,9 @@ ul li{
       height: 100%;
       --border-radius:0 10px 10px 0;
     }
+  .sendbuttonplay{
+     --background:rgba(32, 130, 241, 0.3);
+  }
   .sendbutton p{
       line-height: 0;
  }

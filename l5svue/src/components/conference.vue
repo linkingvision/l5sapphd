@@ -43,7 +43,7 @@
                         <ion-item class="conference-action-item" button lines="none" detail='false'  @click="mettevent(item.strToken)">
                                 <ion-label class="action-label">
                                         <h3 >L5S会议平台</h3>
-                                        <p>技术交流视频会议</p>
+                                        <p>{{item.strName}}</p>
                                         <h4>日期:{{item.beginTime}}<span>会议号：{{item.strToken}}</span></h4>
                                         <h4 class="jioninbuttons">
                                             <span class="inlineblock"></span><span>定期会议</span> 
@@ -53,7 +53,7 @@
                                 <ion-note slot="end" class="boting" color='primary' v-if="!item.bStartStatus">筹备中</ion-note>
                                 <ion-fab vertical="bottom" horizontal="end" class="actrion-button">
                                     <ion-button fill="outline" class="joinconference" v-if="!item.bStartStatus">等待会议</ion-button>
-                                    <ion-button  class="joinconference" v-if="item.bStartStatus">加入会议</ion-button>
+                                    <ion-button  class="joinconferencen" v-if="item.bStartStatus">加入会议</ion-button>
                                 </ion-fab>
                         </ion-item>
                     </ion-col>
@@ -74,7 +74,8 @@ data(){
        meetdata:[],
        daterecent:[],
        conference:'',
-       joinusertoken:''
+       joinusertoken:'',
+       conferencename:''
     } 
 },
 mounted(){
@@ -109,10 +110,11 @@ mounted(){
                         if(jointoken==data[i].strToken){
                             if(data[i].bStartStatus){
                                 console.log(data[i].bStartStatus)
+                                this.conferencename=data[i].strName
                                 $('.joinconference').hide()
                                 let _this=this
                                 _this.$nextTick(() => {
-                                    _this.$emit('Videoconference',jointoken)
+                                    _this.$emit('Videoconference',[jointoken,this.conferencename])
                                     _this.$parent.Videoconferenceintercom()
                                     // _this.$parent.joinshowModal()
                                 })
@@ -298,6 +300,7 @@ mounted(){
 .conference-action-item{
      --background:#282828;
      --color:#D3D3D3;
+     --min-height:160px;
      --color-activated:#1562FF !important;
      --background-activated:#1562FF;
 }
@@ -314,6 +317,7 @@ mounted(){
 .action-label h4{
     color:#999999;
     font-size: 10px;
+    margin-top:4px;
 }
 .boting{
     /* margin-top: 0; */
@@ -325,6 +329,7 @@ mounted(){
 }
 .jioninbuttons{
     line-height: 32px;
+    margin-top:15px !important;
 }
 .jioninbuttons .inlineblock{
     display: inline-block;
@@ -341,7 +346,12 @@ mounted(){
 } */
 .joinconference{
     width: 100px;
-    height:30px;
+    height:35px;
+    --border-width:1px;
+}
+.joinconferencen{
+    width: 100px;
+    height:35px;
 }
 .jioninbuttons span{
     color:#F8F8F8;

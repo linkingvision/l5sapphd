@@ -51,7 +51,7 @@
                                <img src="../assets/imgs/menu.png" alt="">
                             </ion-button>
                         </ion-item>
-                        <ion-item lines='none' class="item-left"  @click="oneToonevue()">
+                        <ion-item lines='none' class="item-left"  @click="cleartdata()">
                             <ion-button class="leftbtn" id="leftbtntwo">
                                <img src="../assets/imgs/onetoone.png" alt="">
                             </ion-button> 
@@ -147,7 +147,8 @@ export default {
             conferencevalue:'1',
             playVluename:'',
             playvideoprops:'',
-            struuid:''
+            struuid:'',
+            createdconferencename:''
         }
     },  
  beforeDestroy() {
@@ -177,6 +178,7 @@ export default {
     },
      //  点击打开会议页面
     conferencebtn(e){
+    
         this.conferencevalue='1'
         
         $("#leftbtnone").addClass('newClass')
@@ -186,11 +188,20 @@ export default {
      //  点击打开一对一会议
     oneToonevue(){
         this.conferencevalue='2'
-        
         $("#leftbtntwo").addClass('newClass')
         $("#leftbtnone").removeClass('newClass')
         $("#leftbtnthree").removeClass('newClass')
-    },
+     },
+    //  清除数据
+     cleartdata(){
+        this.usertokens=''
+        this.playvideoprops=''
+        this.struuid=''
+        this.conferencevalue='2'
+        $("#leftbtntwo").addClass('newClass')
+        $("#leftbtnone").removeClass('newClass')
+        $("#leftbtnthree").removeClass('newClass')
+     },
      //  点击打开进入设置页面
      sendbutton(){
         this.conferencevalue='3' 
@@ -314,7 +325,9 @@ export default {
        } ,
        // 列表获取
     mettuserlist(jointoken){
-         this.userdataconfertoken=jointoken
+        console.log(jointoken)
+         this.userdataconfertoken=jointoken[0]
+         this.createdconferencename=jointoken[1]
          console.log(this.userdataconfertoken)
          this.mettuselest()
     },

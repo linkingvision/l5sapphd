@@ -37,9 +37,16 @@ export default {
      l5svideplay(){
         if(this.meettoken!=undefined){
           //  this.$root.bus.$emit('meettoken', this.meettoken);
-           this.$emit('meettoken',[this.meettoken,this.struuid])
-           console.log(this.struuid)
-           this.$parent.oneToonevue()
+           
+           if(this.$parent.conferencevalue=='2'){
+              this.$root.bus.$emit('meettoken', this.meettoken,this.struuid);
+              console.log(this.struuid)
+           }else{
+              this.$emit('meettoken',[this.meettoken,this.struuid])
+              console.log(this.struuid)
+              this.$parent.oneToonevue()
+           }
+           
         }
      },
        //会议通知弹窗    
