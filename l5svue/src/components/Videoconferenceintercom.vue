@@ -85,7 +85,8 @@ export default {
             AudioIn:'',
             chattext:'',
             camera:'',
-            participant:this.userdataconferpro
+            participant:this.userdataconferpro,
+            timer:''
         }
     }, 
 watch:{
@@ -118,31 +119,22 @@ watch:{
   },
  created(){
       H5sRTCGetCapability(this.UpdateCapability)
-        if (this.h5handler != undefined)
-        {
-            this.h5handler.disconnect();
-            delete this.h5handler;
-            this.h5handler = undefined;
-        }
-        if (this.v1 != undefined)
-        {
-            this.v1.disconnect();
-            delete this.v1;
-            this.v1 = undefined;
-        }  
+      // 全局事件是不跟随生命周期状体，切换的时候 如果不手动清除他会多次被注册
+      this.$root.bus.$off('connection') 
    },
  mounted(){
     console.log(this.participant)
     if(this.usertoken!=undefined){
+        this.l5svideplay() 
         this.showcamer()
       }
     let _this=this
-    _this.$root.bus.$on('connection', function(camerdata){
+  _this.$root.bus.$on('connection', function(camerdata){
         console.log(camerdata)
         _this.camera=camerdata  
         _this.$parent.cancelluploadinfo()
-        _this.l5svideplay()
-     })
+        _this.connection()  
+    })
   },
   methods:{
     showcamer(){
@@ -166,21 +158,12 @@ watch:{
     l5svideplay(){
           console.log(this.usertoken)
           if (this.h5handler != undefined)
-            {
+             {
                 this.h5handler.disconnect();
                 this.h5handler = undefined;
                 delete this.h5handler;
-            }
-            if (this.v1 != undefined)
-            {
-                this.v1.disconnect();
-                this.v1 = undefined;
-                delete this.v1;
-            }  
-          $('.sendbutton').addClass('sendbuttonplay')
-          $('.videobutton').addClass('sendbuttonplay')
-           //   console.log(playid,token,streamprofile)
-          let conf = {
+             }
+           let conf = {
                videoid:"h5sVideoRemote",
                protocol:this.$store.state.protocol, //http: or https:
                host: this.$store.state.Useport.ip+':'+this.$store.state.Useport.port, //localhost:8080
@@ -194,24 +177,16 @@ watch:{
             
             this.h5handler = new H5sPlayerWS(conf);
             this.h5handler.connect( );
-            // setInterval(()=>{
-                  this.connection()
-            // },2000)
+           // 按钮变透明
+            $('.sendbutton').addClass('sendbuttonplay')
+            $('.videobutton').addClass('sendbuttonplay')
         },
       //开启视频
       connection(){
-          console.log(8888888)
-            if (this.h5handler != undefined)
-                {
-                    this.h5handler.disconnect();
-                    this.h5handler = undefined;
-                    delete this.h5handler;
-                }
-                if (this.v1 != undefined)
-               {
-                   this.v1.disconnect();
-                   this.v1 = undefined;
-                   delete this.v1;
+                if (this.v1 != undefined){
+                this.v1.disconnect();
+                this.v1 = undefined;
+                delete this.v1;
                  }  
                 console.log(this.camera)
                 var audioout=this.audioout
@@ -349,6 +324,8 @@ watch:{
                 this.h5handler = undefined;
                 console.log('h5handler')
                 // this.$router.push('/Flatlogin');
+                $('.sendbutton').removeClass('sendbuttonplay')
+                $('.videobutton').removeClass('sendbuttonplay')
             }
             if (this.v1!= undefined)
             {
@@ -356,9 +333,12 @@ watch:{
                 delete this.v1;
                 this.v1 = undefined;
                 // this.$router.push('/Flatlogin')
-                console.log('')
+                console.log('v')
+                $('.sendbutton').removeClass('sendbuttonplay')
+                $('.videobutton').removeClass('sendbuttonplay')
              }
              console.log('停止')
+          
         }, 
     }
 }

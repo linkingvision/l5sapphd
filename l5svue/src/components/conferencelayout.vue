@@ -71,7 +71,7 @@
                <ion-col size='15' class="leftmenu">
                   <Conference v-if="conferencevalue=='1'" @Videoconference='mettuserlist' ref="linkconference"></Conference>
                   <Videoconferenceintercom v-if="conferencevalue=='Videoconferenceintercom'" ref="linkVideoconference" :videotokeo='userdataconfertoken' :userdataconferpro='userdataconfer'></Videoconferenceintercom>
-                  <Onetoone v-if="conferencevalue=='2'" ref="linkonetoone" :userdatatoken="usertokens" :playusername='playvideoprops' :struuiname='struuid'></Onetoone>
+                  <Onetoone v-if="conferencevalue=='2'" ref="linkonetoone" :userdatatoken="usertokens" :playusername='playvideoprops' :struuiname='struuid' :camerlabelnameprop='camerlabelname'></Onetoone>
                </ion-col>
              </ion-row>
           </ion-grid> 
@@ -100,6 +100,11 @@
                 <div class="oneTooneposition">
                     <ion-item class="onetooneconfercenum" lines="none">
                         <ion-label>确定要呼叫<span style="color:#67C23A;">{{playVluename}}</span>吗？</ion-label>
+                    </ion-item>
+                    <ion-item lines="none" class="camer-switchitem">
+                        <ion-label class="camer-label">{{camerlabelname}}</ion-label>
+                        <ion-toggle class='camer-togggle' :checked="camercheck"  @ionChange="camercheck=$event.target.checked">
+                        </ion-toggle>
                     </ion-item>
                     <ion-item lines="none" class="onetooneconfercenum">
                         <ion-button slot="start" color='secondary'  shape="round" fill="outline" class="onecancelbtn" @click="onetoonecancell()">取消</ion-button>
@@ -142,15 +147,29 @@ export default {
             h5handler:undefined,
             userdata:[],
             userdataconfer:[],
+            showevetlist:'0',
             userdataconfertoken:'',
             usertokens:'',
             conferencevalue:'1',
             playVluename:'',
             playvideoprops:'',
             struuid:'',
-            createdconferencename:''
+            createdconferencename:'',
+            camercheck:false,
+            camerlabelname:'user',
+           
         }
-    },  
+    },
+ watch:{
+     	 camercheck(val){
+              this.camercheck=val
+			  if(this.camercheck==true){
+                 this.camerlabelname='environment'
+             }else{
+                this.camerlabelname='user'
+            }
+		},
+   },  
  beforeDestroy() {
         if (this.h5handler != undefined)
         {
@@ -169,12 +188,12 @@ export default {
       H5sRTCGetCapability(this.UpdateCapability)  
    },
   mounted(){
-     this.getuser()
-     $("#leftbtnone").addClass('newClass') 
+      this.getuser()
+      $("#leftbtnone").addClass('newClass') 
   },
   methods:{
     createdlink(){
-      this.$refs.linkconference.meetingdata()
+       this.$refs.linkconference.meetingdata()
     },
      //  点击打开会议页面
     conferencebtn(e){
@@ -211,7 +230,7 @@ export default {
     },
      // 进入会议页面的显示
     Videoconferenceintercom(){
-        this.conferencevalue='Videoconferenceintercom' 
+         this.conferencevalue='Videoconferenceintercom' 
     },
     // 显示模态框
     createdModal(){
@@ -234,10 +253,10 @@ export default {
          $('.Joinconference').css('display','none')
     },
 
-    // 显示上传信息
+     // 显示上传信息
     uploadinfo(){
-        $('.backdrop').css('display','block')
-        $('.camerinfo').css('display','block') 
+         $('.backdrop').css('display','block')
+         $('.camerinfo').css('display','block') 
     },
        // 取消会议模态框 、
     cancelluploadinfo(){
@@ -246,12 +265,20 @@ export default {
     },
     // onetoone模态框
     onetooneshow(){
-        $('.backdrop').css('display','block')
-        $('.onetoonemoald').css('display','block') 
+         $('.backdrop').css('display','block')
+         $('.onetoonemoald').css('display','block') 
     },
     onetoonecancell(){
          $('.backdrop').css('display','none')
          $('.onetoonemoald').css('display','none')
+    },
+    //  阴影
+    eventbgc(){
+         $('.backdrop').css('display','block')
+    },
+    // 取消阴影
+    cancelleventbgc(){
+         $('.backdrop').css('display','none')
     },
     //  获取用户信息
     getuser(){
@@ -285,7 +312,7 @@ export default {
          this.onetooneshow()
      },
     //  确定拨打
-    onetoonedongokey(){
+    onetoonedongokey(){  
           this.onetoonecancell()
           let playparit=this.playVluename
           this.playvideoprops=playparit
@@ -299,6 +326,7 @@ export default {
             console.log(meettoken[0],meettoken[1])
             this.usertokens=meettoken[0]
             this.struuid=meettoken[1]
+            this.camerlabelname=meettoken[2]
         }
     },
     //视频对讲
@@ -690,4 +718,20 @@ ul li{
      width: 80px;
      height: 30px;
 }
+.camer-switchitem{
+    --background:transparent;
+    --color:#FFFFFF;
+    --min-height:20px;
+    font-size: 18px;
+    width: 190px;
+    --padding-start:18px;
+    margin: 0 auto;
+}
+/* ion-toggle {
+  --background: #FFFFFF;
+  /* --background-checked: #32C88C; */
+
+  /* --handle-background: #FFFFFF;
+  --handle-background-checked: #FFFFFF; */
+/* }  */
 </style>

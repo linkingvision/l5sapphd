@@ -76,7 +76,7 @@ import {H5sPlayerWS,H5sPlayerHls,H5sPlayerRTC,H5sRTCGetCapability,H5sPlayerAudBa
 import * as types from '@/vuex/types'
 export default {
     name: 'Onetoonevideo',
-    props:["userdatatoken","playusername",'struuiname'],
+    props:["userdatatoken","playusername",'struuiname','camerlabelnameprop'],
     data(){
         return{
             v1:undefined,
@@ -90,7 +90,8 @@ export default {
             Resolution:'',
             AudioIn:'',
             chattext:'',
-            struuinameprop:this.struuiname
+            struuinameprop:this.struuiname,
+            camervalue:this.camerlabelnameprop
         }
     }, 
  watch:{
@@ -112,6 +113,12 @@ export default {
         },
         deep:true
     },
+    camerlabelnameprop:{
+        handler(val,oldval){
+           this.camervalue=val
+        },
+        deep:true
+    }
  },
  beforeDestroy() {
         if (this.h5handler != undefined)
@@ -138,15 +145,18 @@ export default {
             this.usertoken=''
             this.playusernameonetoone=''
         }
-    
-     },
+       // 全局事件是不跟随生命周期状体，切换的时候 如果不手动清除他会多次被注册
+       this.$root.bus.$off('meettoken')
+      },
+      
   mounted(){
       console.log(this.userdatatoken)
       let _this=this
-      _this.$root.bus.$on('meettoken',function(token,struuid){
-          console.log(token)
+      _this.$root.bus.$on('meettoken',function(token,struuid,camername){
+          console.log(token,struuid,camername)
           _this.usertoken=token
           _this.struuinameprop=struuid
+          _this.camervalue=camername
           _this.l5splay()
       })
       //  在本页面的拨打过来的值
@@ -210,12 +220,11 @@ export default {
             console.log(conftoken)
             this.h5handler = new H5sPlayerWS(conf);
             this.h5handler.connect( );
-            
-            // this.connection()
       },
       //开启视频
       connection(){
-            if (this.v1 != undefined)
+          console.log(this.camerlabelnameprop)
+          if (this.v1 != undefined)
                 {
                     this.v1.disconnect();
                     delete this.v1;
@@ -230,7 +239,7 @@ export default {
                     rootpath:'/', // {string} - path of the app running
                     user:this.$store.state.Useport.user, // {string} - user name
                     type:'media', // {string} - media or sharing
-                    // facingmode:"environment", // {string} - user or environment; desktop remove this config
+                    facingmode:this.camervalue, // {string} - user or environment; desktop remove this config
                     audio: audioout,
                     callback: this.PlaybackCB, //Callback for the event
                     userdata: null, // user data
