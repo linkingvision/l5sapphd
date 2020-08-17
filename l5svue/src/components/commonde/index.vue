@@ -33,7 +33,7 @@ export default {
 		    sharedstop:undefined, 
           el:undefined,
           struuid:undefined,
-          answercamercheck:'',
+          answercamercheck:false,
           showevetlist:'0',
           createdconferencename:'',
           camercheck:false,
@@ -41,7 +41,7 @@ export default {
        }
    },
   watch:{
-     	 camercheck(val){
+     	 answercamercheck(val){
               this.camercheck=val
 			  if(this.camercheck==true){
                  this.camerlabelname='environment'
@@ -95,31 +95,6 @@ export default {
         this.$parent.cancelleventbgc()
         this.showevetlist='0'
      },
-   //     //会议通知弹窗    
-   //   presentAlertConfirm() {
-   //    return this.$ionic.alertController
-   //        .create({
-   //        cssClass: 'my-custom-class',
-   //        header: '视频会议',
-   //        message: '是否加入视频会议？',
-   //        buttons: [{
-   //            text: '否',
-   //            role: 'cancel',
-   //            cssClass: 'secondary',
-   //            handler: blah => {
-   //            console.log('Confirm Cancel:', blah)
-   //            },},
-   //            {
-   //            text: '是',
-   //            handler: () => {
-   //               console.log(this.meettoken)
-   //               this.l5svideplay()
-   //            },
-   //          },
-   //        ],
-   //      })
-   //      .then(a => a.present())
-   //  }, 
     
     videoConferen(){
         var root = process.env.API_ROOT;
@@ -152,9 +127,7 @@ export default {
                 this.meettoken=msgevent.sendConference.token;
                 this.struuid=msgevent.strUUID
                 console.log("****",msgevent)
-               //  this.presentAlertConfirm()
-               //  this.$parent.showevent()  
-             this.showevent()
+                this.showevent()
          }else if(msgevent.type=="H5S_EVENT_START_SHARE_DESKTOP"){
 				        // this.sharedstart=msgevent.shareDesktop.token;
 				        // console.log("****",msgevent)
